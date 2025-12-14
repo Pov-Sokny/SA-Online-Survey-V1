@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { useLoginMutation } from "@/lib/features/auth/auth-api"
+import { useLoginMutation, authApi } from "@/lib/features/auth/auth-api"
 import { setCredentials } from "@/lib/features/auth/auth-slice"
 import { useAppDispatch } from "@/lib/hooks"
 import { Button } from "@/components/ui/button"
@@ -23,48 +23,63 @@ export function LoginForm() {
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+        const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
 
     try {
       const credentials = {
         email,
-        username: email, // Some Spring Boot apps use username instead of email
+        username: email,
         password,
       }
 
-      const result = await login(credentials).unwrap()
-      console.log("Login successful:", result)
+      console.log("[v0] Attempting login...")
+      const loginResponse = await login(credentials).unwrap()
+      console.log("[v0] Login successful, response:", loginResponse)
+      console.log("[v0] Cookies after login:", document.cookie)
 
-      const token = result.token || result.accessToken || result.jwt
+      await new Promise((resolve) => setTimeout(resolve, 100))
 
-      if (!token) {
-        throw new Error("No token received from server")
+      try {
+        console.log("[v0] Fetching current user...")
+        const result = await dispatch(authApi.endpoints.getCurrentUser.initiate()).unwrap()
+        console.log("[v0] User data fetched:", result)
+
+        if (result) {
+          dispatch(setCredentials({ user: result }))
+          router.push("/dashboard")
+        } else {
+          setError("Failed to fetch user data. Please try again.")
+        }
+      } catch (fetchError: any) {
+        console.log("[v0] Error fetching user:", fetchError)
+        if (fetchError?.status === 401) {
+          setError(
+            "Cookie not sent. Check backend Set-Cookie header includes: Path=/; HttpOnly; SameSite=None; Secure (for ngrok)",
+          )
+        } else {
+          setError("Failed to load user profile. Please try again.")
+        }
       }
-
-      const user = result.user || {
-        id: result.id || "",
-        email: result.email || email,
-        name: result.name || result.username || "",
-        username: result.username || "",
-      }
-
-      dispatch(
-        setCredentials({
-          token,
-          user,
-        }),
-      )
-
-      router.push("/dashboard")
     } catch (err: any) {
-      console.error(" Login failed:", err)
-      const errorMessage =
-        err?.data?.message || err?.data?.error || err?.error || "Login failed. Please check your credentials."
-      setError(errorMessage)
+      console.log("[v0] Login error:", err)
+      if (err?.message?.includes("CORS") || err?.name === "TypeError") {
+        setError("Connection blocked. Backend CORS must allow origin 'http://localhost:3000' with credentials: true")
+      } else if (err.status === 401) {
+        setError("Invalid credentials. Please try again.")
+      } else if (err.status === 404) {
+        setError("Login endpoint not found. Please contact support.")
+      } else if (err.status === 500) {
+        setError("Server error. Please try again later.")
+      } else {
+        const errorMessage =
+          err?.data?.message || err?.data?.error || err?.error || "Login failed. Please check your credentials."
+        setError(errorMessage)
+      }
     }
   }
+
 
   return (
     <Card className="w-full max-w-md">
