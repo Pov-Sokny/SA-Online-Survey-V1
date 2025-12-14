@@ -18,11 +18,11 @@ export interface LoginResponse {
     name?: string
     username?: string
   }
-  // Spring Boot might include user data at root level
   id?: string
   email?: string
   name?: string
   username?: string
+  message?: string
 }
 
 export interface User {
@@ -36,11 +36,8 @@ export const authApi = createApi({
   reducerPath: "authApi",
   baseQuery: fetchBaseQuery({
     baseUrl: API_BASE_URL,
-    prepareHeaders: (headers, { getState }) => {
-      const token = (getState() as any).auth.token
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`)
-      }
+    credentials: "include",
+    prepareHeaders: (headers) => {
       // Add ngrok headers to bypass browser warning
       headers.set("ngrok-skip-browser-warning", "true")
       headers.set("Content-Type", "application/json")
@@ -56,7 +53,7 @@ export const authApi = createApi({
         body: credentials,
       }),
       transformResponse: (response: any) => {
-        console.log("[v0] Spring Boot login response:", response)
+        console.log("[v0] Login response (cookie set by backend):", response)
         return response
       },
       invalidatesTags: ["Auth"],
@@ -64,6 +61,10 @@ export const authApi = createApi({
     getCurrentUser: builder.query<User, void>({
       query: () => "/auth/me",
       providesTags: ["User"],
+      transformErrorResponse: (response) => {
+        console.log("[v0] Auth check failed with status:", response.status)
+        return response
+      },
     }),
     logout: builder.mutation<void, void>({
       query: () => ({

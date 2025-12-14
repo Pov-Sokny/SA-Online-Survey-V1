@@ -6,6 +6,7 @@ import { useRef, useEffect } from "react"
 import { Provider } from "react-redux"
 import { makeStore, type AppStore } from "@/lib/store"
 import { restoreAuth } from "@/lib/features/auth/auth-slice"
+import { authApi } from "@/lib/features/auth/auth-api"
 
 export default function StoreProvider({
   children,
@@ -19,22 +20,26 @@ export default function StoreProvider({
   }
 
   useEffect(() => {
-    // Restore auth state from localStorage on mount
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("auth_token")
-      const userStr = localStorage.getItem("user")
+    const checkAuth = async () => {
+      try {
+        const result = await storeRef.current?.dispatch(authApi.endpoints.getCurrentUser.initiate())
 
-      if (token && userStr) {
-        try {
-          const user = JSON.parse(userStr)
-          storeRef.current?.dispatch(restoreAuth({ token, user }))
-        } catch (error) {
-          console.error("Failed to restore auth state:", error)
-          localStorage.removeItem("auth_token")
-          localStorage.removeItem("user")
+        if (result?.data) {
+          console.log("[v0] Auth restored from API, status: 200")
+          storeRef.current?.dispatch(
+            restoreAuth({
+              user: result.data,
+            }),
+          )
+        } else {
+          console.log("[v0] Not authenticated, status:", result?.error?.status || "unknown")
         }
+      } catch (error) {
+        console.log("[v0] Auth check failed:", error)
       }
     }
+
+    checkAuth()
   }, [])
 
   return <Provider store={storeRef.current}>{children}</Provider>

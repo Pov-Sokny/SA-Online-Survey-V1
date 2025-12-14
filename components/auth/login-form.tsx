@@ -30,18 +30,12 @@ export function LoginForm() {
     try {
       const credentials = {
         email,
-        username: email, // Some Spring Boot apps use username instead of email
+        username: email,
         password,
       }
 
       const result = await login(credentials).unwrap()
-      console.log("Login successful:", result)
-
-      const token = result.token || result.accessToken || result.jwt
-
-      if (!token) {
-        throw new Error("No token received from server")
-      }
+      console.log("[v0] Login successful, cookie set by backend")
 
       const user = result.user || {
         id: result.id || "",
@@ -50,19 +44,24 @@ export function LoginForm() {
         username: result.username || "",
       }
 
-      dispatch(
-        setCredentials({
-          token,
-          user,
-        }),
-      )
+      dispatch(setCredentials({ user }))
+      console.log(user);
 
       router.push("/dashboard")
     } catch (err: any) {
-      console.error(" Login failed:", err)
-      const errorMessage =
-        err?.data?.message || err?.data?.error || err?.error || "Login failed. Please check your credentials."
-      setError(errorMessage)
+      console.error("[v0] Login failed:", err)
+
+      if (err.status === 401) {
+        setError("Invalid credentials. Please try again.")
+      } else if (err.status === 404) {
+        setError("Login endpoint not found. Please contact support.")
+      } else if (err.status === 500) {
+        setError("Server error. Please try again later.")
+      } else {
+        const errorMessage =
+          err?.data?.message || err?.data?.error || err?.error || "Login failed. Please check your credentials."
+        setError(errorMessage)
+      }
     }
   }
 
