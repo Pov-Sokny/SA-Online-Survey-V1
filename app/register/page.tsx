@@ -1,11 +1,11 @@
 "use client"
 
-import { LoginForm } from "@/components/auth/login-form"
+import { RegisterForm } from "@/components/auth/register-form"
 import { useAppSelector } from "@/lib/hooks"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const router = useRouter()
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
 
@@ -22,7 +22,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
-      <LoginForm />
+      <RegisterForm />
     </div>
   )
 }

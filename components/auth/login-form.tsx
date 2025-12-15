@@ -4,13 +4,14 @@ import type React from "react"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { useLoginMutation, authApi } from "@/lib/features/auth/auth-api"
 import { setCredentials } from "@/lib/features/auth/auth-slice"
 import { useAppDispatch } from "@/lib/hooks"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2 } from "lucide-react"
 
@@ -73,7 +74,6 @@ export function LoginForm() {
     }
   }
 
-
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
@@ -126,6 +126,15 @@ export function LoginForm() {
           </Button>
         </form>
       </CardContent>
+      <CardFooter className="flex justify-center">
+        <p className="text-sm text-muted-foreground">
+          Don't have an account?{" "}
+          <Link href="/register" className="font-medium text-primary hover:underline">
+            Register
+          </Link>
+        </p>
+      </CardFooter>
+      {/* </CHANGE> */}
     </Card>
   )
 }
