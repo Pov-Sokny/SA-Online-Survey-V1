@@ -23,7 +23,7 @@ export function LoginForm() {
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
 
-        const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
 
@@ -34,17 +34,12 @@ export function LoginForm() {
         password,
       }
 
-      console.log("[v0] Attempting login...")
-      const loginResponse = await login(credentials).unwrap()
-      console.log("[v0] Login successful, response:", loginResponse)
-      console.log("[v0] Cookies after login:", document.cookie)
+      await login(credentials).unwrap()
 
       await new Promise((resolve) => setTimeout(resolve, 100))
 
       try {
-        console.log("[v0] Fetching current user...")
         const result = await dispatch(authApi.endpoints.getCurrentUser.initiate()).unwrap()
-        console.log("[v0] User data fetched:", result)
 
         if (result) {
           dispatch(setCredentials({ user: result }))
@@ -53,17 +48,15 @@ export function LoginForm() {
           setError("Failed to fetch user data. Please try again.")
         }
       } catch (fetchError: any) {
-        console.log("[v0] Error fetching user:", fetchError)
         if (fetchError?.status === 401) {
           setError(
-            "Cookie not sent. Check backend Set-Cookie header includes: Path=/; HttpOnly; SameSite=None; Secure (for ngrok)",
+            "Authentication failed. Check backend Set-Cookie header includes: Path=/; HttpOnly; SameSite=None; Secure (for ngrok)",
           )
         } else {
           setError("Failed to load user profile. Please try again.")
         }
       }
     } catch (err: any) {
-      console.log("[v0] Login error:", err)
       if (err?.message?.includes("CORS") || err?.name === "TypeError") {
         setError("Connection blocked. Backend CORS must allow origin 'http://localhost:3000' with credentials: true")
       } else if (err.status === 401) {
