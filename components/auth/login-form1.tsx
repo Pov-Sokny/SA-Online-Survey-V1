@@ -15,7 +15,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2 } from "lucide-react"
 
-export function LoginForm() {
+export function LoginForm1() {
   const router = useRouter()
   const dispatch = useAppDispatch()
   const [login, { isLoading }] = useLoginMutation()
@@ -75,38 +75,29 @@ export function LoginForm() {
   }
 
 return (
-  <div
-    className="
-      relative min-h-screen w-full
-      flex items-center justify-center
-      bg-cover bg-center bg-no-repeat
-    "
-    style={{
-      backgroundImage: "url('/login.jpg')",
-    }}
-  >
-    {/* Dark / gradient overlay for readability */}
-    <div className="absolute inset-0 bg-black/5 " />
+  <div className="relative min-h-screen w-full overflow-hidden bg-[#0b0b1e] flex items-center justify-center px-4">
+    {/* Gradient Blobs */}
+    <div className="absolute -top-32 -left-32 h-[320px] w-[320px] rounded-full bg-gradient-to-br from-green-400 to-cyan-400 blur-3xl opacity-90" />
+    <div className="absolute -bottom-40 right-0 h-[360px] w-[360px] rounded-full bg-gradient-to-br from-pink-500 to-orange-400 blur-3xl opacity-90" />
 
     {/* Glass Card */}
     <Card
       className="
         relative z-10
-        w-full max-w-sm sm:max-w-md
+        w-full max-w-xs sm:max-w-sm
         rounded-2xl
+        bg-white/10
+        backdrop-blur-xl
         border border-white/20
-        bg-white/10 dark:bg-black/10
-        backdrop-blur-[4px]
         shadow-2xl
-        px-1 py-3 
       "
     >
-      <CardHeader className="space-y-1 text-center">
-        <CardTitle className="text-xl sm:text-2xl font-semibold">
-          Login
+      <CardHeader className="text-center space-y-1">
+        <CardTitle className="text-xl font-semibold text-white">
+          Sign In
         </CardTitle>
-        <CardDescription className="text-sm sm:text-base text-gray-800">
-          Enter your information to login to Survey Online
+        <CardDescription className="text-white/70 text-sm">
+          Enter your information to login
         </CardDescription>
       </CardHeader>
 
@@ -118,12 +109,19 @@ return (
             </Alert>
           )}
 
-          <div className="space-y-2">
-            <Label htmlFor="email">Email or Username</Label>
+          <div className="space-y-1">
+            <Label className="text-white/80">Email or Username</Label>
             <Input
+              className="
+                bg-white/20
+                border-white/20
+                text-white
+                placeholder:text-white/50
+                focus-visible:ring-primary
+              "
               id="email"
               type="text"
-              placeholder="you@example.com"
+              placeholder="Username"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -131,12 +129,19 @@ return (
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+          <div className="space-y-1">
+            <Label className="text-white/80">Password</Label>
             <Input
+              className="
+                bg-white/20
+                border-white/20
+                text-white
+                placeholder:text-white/50
+                focus-visible:ring-primary
+              "
               id="password"
               type="password"
-              placeholder="••••••••"
+              placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -146,28 +151,36 @@ return (
 
           <Button
             type="submit"
-            className="w-full rounded-xl"
             disabled={isLoading}
+            className="
+              w-full
+              rounded-lg
+              bg-gradient-to-r
+              from-green-400
+              via-cyan-400
+              to-pink-500
+              text-black
+              font-medium
+              hover:opacity-90
+              transition
+            "
           >
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Logging in...
+                Signing in...
               </>
             ) : (
-              "Login"
+              "Sign In"
             )}
           </Button>
         </form>
       </CardContent>
 
-      <CardFooter className="flex justify-center">
-        <p className="text-sm text-black">
+      <CardFooter className="justify-center">
+        <p className="text-xs text-white/60">
           Don&apos;t have an account?{" "}
-          <Link
-            href="/register"
-            className="font-medium text-primary hover:underline"
-          >
+          <Link href="/register" className="text-primary hover:underline">
             Register
           </Link>
         </p>

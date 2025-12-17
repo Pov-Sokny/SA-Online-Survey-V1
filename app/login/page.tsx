@@ -1,6 +1,7 @@
 "use client"
 
 import { LoginForm } from "@/components/auth/login-form"
+import { LoginForm1 } from "@/components/auth/login-form1"
 import { useAppSelector } from "@/lib/hooks"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
@@ -21,8 +22,8 @@ export default function LoginPage() {
   // </CHANGE>
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
-      <LoginForm />
+    <div className="flex min-h-screen items-center justify-center">
+      <LoginForm1 />
     </div>
   )
 }
