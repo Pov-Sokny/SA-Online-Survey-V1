@@ -75,20 +75,27 @@ export function LoginForm1() {
   }
 
 return (
-  <div className="relative min-h-screen w-full overflow-hidden bg-[#0b0b1e] flex items-center justify-center px-4">
-    {/* Gradient Blobs */}
-    <div className="absolute -top-32 -left-32 h-[320px] w-[320px] rounded-full bg-gradient-to-br from-green-400 to-cyan-400 blur-3xl opacity-90" />
-    <div className="absolute -bottom-40 right-0 h-[360px] w-[360px] rounded-full bg-gradient-to-br from-pink-500 to-orange-400 blur-3xl opacity-90" />
-
+  <div className="
+      relative min-h-screen w-full
+      flex items-center justify-center
+      bg-cover bg-center bg-no-repeat
+      px-4
+    "
+    style={{
+      backgroundImage: "url('/login.jpg')",
+    }}
+  >
+    {/* Overlay */}
+    <div className="absolute inset-0 bg-black/20" />
     {/* Glass Card */}
     <Card
       className="
         relative z-10
-        w-full max-w-xs sm:max-w-sm
+        w-full max-w-sm sm:max-w-md
         rounded-2xl
-        bg-white/10
-        backdrop-blur-xl
         border border-white/20
+        bg-white/40
+        backdrop-blur-md
         shadow-2xl
       "
     >

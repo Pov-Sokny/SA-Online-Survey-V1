@@ -15,7 +15,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2 } from "lucide-react"
 
-export function LoginForm() {
+export function LoginForm2() {
   const router = useRouter()
   const dispatch = useAppDispatch()
   const [login, { isLoading }] = useLoginMutation()
@@ -80,13 +80,14 @@ return (
       relative min-h-screen w-full
       flex items-center justify-center
       bg-cover bg-center bg-no-repeat
+      px-4
     "
     style={{
-      backgroundImage: "url('/auth/login1.jpg')",
+      backgroundImage: "url('/login.jpg')",
     }}
   >
-    {/* Dark / gradient overlay for readability */}
-    <div className="absolute inset-0 bg-black/5 " />
+    {/* Overlay */}
+    <div className="absolute inset-0 bg-black/20" />
 
     {/* Glass Card */}
     <Card
@@ -95,17 +96,16 @@ return (
         w-full max-w-sm sm:max-w-md
         rounded-2xl
         border border-white/20
-        bg-white/10 dark:bg-black/10
-        backdrop-blur-[6px]
-        shadow-7xl
-        px-1 py-3 
+        bg-white/40
+        backdrop-blur-md
+        shadow-2xl
       "
     >
       <CardHeader className="space-y-1 text-center">
-        <CardTitle className="text-xl sm:text-2xl font-semibold text-gray-300">
+        <CardTitle className="text-xl sm:text-2xl font-semibold text-primary">
           Login
         </CardTitle>
-        <CardDescription className="text-sm sm:text-base text-gray-200">
+        <CardDescription className="text-sm sm:text-base text-muted-foreground">
           Enter your information to login to Survey Online
         </CardDescription>
       </CardHeader>
@@ -118,10 +118,9 @@ return (
             </Alert>
           )}
 
-          <div className="space-y-2">
-            <Label className="text-gray-300" htmlFor="email">Email or Username</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="email">Email or Username</Label>
             <Input
-              className="text-gray-100"
               id="email"
               type="text"
               placeholder="you@example.com"
@@ -129,13 +128,13 @@ return (
               onChange={(e) => setEmail(e.target.value)}
               required
               disabled={isLoading}
+              className="focus-visible:ring-primary"
             />
           </div>
 
-          <div className="space-y-2">
-            <Label className="text-gray-300" htmlFor="password">Password</Label>
+          <div className="space-y-1.5">
+            <Label htmlFor="password">Password</Label>
             <Input
-              className="text-gray-100"
               id="password"
               type="password"
               placeholder="••••••••"
@@ -143,13 +142,18 @@ return (
               onChange={(e) => setPassword(e.target.value)}
               required
               disabled={isLoading}
+              className="focus-visible:ring-primary"
             />
           </div>
 
           <Button
             type="submit"
-            className="w-full rounded-xl"
             disabled={isLoading}
+            className="
+              w-full rounded-xl
+              bg-primary text-white
+              hover:bg-primary/90
+            "
           >
             {isLoading ? (
               <>
@@ -164,17 +168,18 @@ return (
       </CardContent>
 
       <CardFooter className="flex justify-center">
-        <p className="text-[14px] text-gray-200 ">
+        <p className="text-sm text-muted-foreground">
           Don&apos;t have an account?{" "}
           <Link
             href="/register"
-            className="font-medium text-primary hover:underline"
+            className="font-medium text-secondary hover:underline"
           >
             Register
           </Link>
         </p>
       </CardFooter>
     </Card>
+    
   </div>
 )
 }
