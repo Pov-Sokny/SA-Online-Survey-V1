@@ -13,8 +13,9 @@ services:
       # This tells your Next.js where the API is
       - NEXT_PUBLIC_API_URL=https://sa-api.supersurvey.live/api/v1
     networks:
-      - sa_online_survey_api_survey-network
+      - survey-network
 
 networks:
-  survey-network:
+  survey-network:  # This is the "Key" or "Alias"
     external: true
+    name: sa_online_survey_api_survey-network
