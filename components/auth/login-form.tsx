@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2 } from "lucide-react"
+import Image from "next/image"
 
 export function LoginForm() {
   const router = useRouter()
@@ -74,107 +75,111 @@ export function LoginForm() {
     }
   }
 
-return (
-  <div
-    className="
+  return (
+    <div
+      className="
       relative min-h-screen w-full
       flex items-center justify-center
       bg-cover bg-center bg-no-repeat
     "
-    style={{
-      backgroundImage: "url('/auth/login1.jpg')",
-    }}
-  >
-    {/* Dark / gradient overlay for readability */}
-    <div className="absolute inset-0 bg-black/5 " />
-
-    {/* Glass Card */}
-    <Card
-      className="
-        relative z-10
-        w-full max-w-sm sm:max-w-md
-        rounded-2xl
-        border border-white/20
-        bg-white/10 dark:bg-black/10
-        backdrop-blur-[6px]
-        shadow-7xl
-        px-1 py-3 
-      "
+      style={{
+        backgroundImage: "url('/auth/login1.jpg')",
+      }}
     >
-      <CardHeader className="space-y-1 text-center">
-        <CardTitle className="text-xl sm:text-2xl font-semibold text-gray-300">
-          Login
-        </CardTitle>
-        <CardDescription className="text-sm sm:text-base text-gray-200">
-          Enter your information to login to Survey Online
-        </CardDescription>
-      </CardHeader>
+      {/* Dark / gradient overlay for readability */}
+      <div className="absolute inset-0 bg-black/30 " />
 
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-
-          <div className="space-y-2">
-            <Label className="text-gray-300" htmlFor="email">Email or Username</Label>
-            <Input
-              className="text-gray-100"
-              id="email"
-              type="text"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              disabled={isLoading}
-            />
+      <section className="relative z-10 w-full max-w-5xl px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 rounded-2xl overflow-hidden shadow-2xl">
+          {/* LEFT: Image (Desktop only, clear & optimized) */}
+          <div className="hidden lg:block relative">
+            <div className="hidden lg:block relative min-h-[520px] isolate">
+              <Image
+                src="/auth/test1.jpg"
+                alt="Login illustration"
+                fill
+                priority
+                quality={100}
+                unoptimized
+                sizes="(min-width: 1024px) 50vw, 0vw"
+                className="object-cover object-fit opacity-100"
+              />
+              {/* <img src="./auth/login-image.jpg" alt=""  width={10000} height={1000}/> */}
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <Label className="text-gray-300" htmlFor="password">Password</Label>
-            <Input
-              className="text-gray-100"
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              disabled={isLoading}
-            />
+          {/* RIGHT: Login Form */}
+          <div className="flex items-center justify-center lg:bg-white/10 lg:backdrop-blur-xl md:p-6 lg:p-10">
+            <Card
+              className="
+          w-full max-w-sm
+          rounded-2xl
+          border border-white/20
+          bg-white/12 dark:bg-black/20
+          backdrop-blur-[10px]
+        "
+            >
+              <CardHeader className="space-y-1 text-center">
+                <CardTitle className="text-xl sm:text-2xl font-semibold text-gray-300">Login</CardTitle>
+                <CardDescription className="text-gray-200">
+                  Enter your information to login to Survey Online
+                </CardDescription>
+              </CardHeader>
+
+              <CardContent>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  {error && (
+                    <Alert variant="destructive">
+                      <AlertDescription>{error}</AlertDescription>
+                    </Alert>
+                  )}
+
+                  <div className="space-y-2">
+                    <Label className="text-gray-300">Email or Username</Label>
+                    <Input
+                      className="text-gray-100"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      disabled={isLoading}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-gray-300">Password</Label>
+                    <Input
+                      type="password"
+                      className="text-gray-100"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      disabled={isLoading}
+                    />
+                  </div>
+
+                  <Button className="w-full rounded-xl" disabled={isLoading}>
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Logging in...
+                      </>
+                    ) : (
+                      "Login"
+                    )}
+                  </Button>
+                </form>
+              </CardContent>
+
+              <CardFooter className="justify-center">
+                <p className="text-sm text-gray-200">
+                  Don&apos;t have an account?{" "}
+                  <Link href="/register" className="text-primary hover:underline">
+                    Register
+                  </Link>
+                </p>
+              </CardFooter>
+            </Card>
           </div>
-
-          <Button
-            type="submit"
-            className="w-full rounded-xl"
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Logging in...
-              </>
-            ) : (
-              "Login"
-            )}
-          </Button>
-        </form>
-      </CardContent>
-
-      <CardFooter className="flex justify-center">
-        <p className="text-[14px] text-gray-200 ">
-          Don&apos;t have an account?{" "}
-          <Link
-            href="/register"
-            className="font-medium text-primary hover:underline"
-          >
-            Register
-          </Link>
-        </p>
-      </CardFooter>
-    </Card>
-  </div>
-)
+        </div>
+      </section>
+    </div>
+  )
 }

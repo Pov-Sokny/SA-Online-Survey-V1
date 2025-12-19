@@ -279,6 +279,7 @@ export function RegisterForm1() {
           </Link>
         </p>
       </CardFooter>
+      
     </Card>
   </div>
 )

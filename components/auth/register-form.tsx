@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, Mail } from "lucide-react"
+import Image from "next/image"
 
 export function RegisterForm() {
   const router = useRouter()
@@ -85,23 +86,222 @@ export function RegisterForm() {
   }
 
   return (
-  <div
-    className="
-      relative min-h-screen w-full
-      flex items-center justify-center
-      bg-cover bg-center bg-no-repeat
-      px-4
-    "
-    style={{
-      backgroundImage: "url('/login.jpg')",
-    }}
-  >
-    {/* Overlay */}
-    <div className="absolute inset-0 bg-black/20" />
+    <div
+      className="
+        relative min-h-screen w-full
+        flex items-center justify-center
+        bg-cover bg-center bg-no-repeat
+      "
+      style={{
+        backgroundImage: "url('/auth/register1.jpg')",
+      }}
+    >
+      {/* Dark overlay for readability */}
+      <div className="absolute inset-0 bg-black/30" />
 
-    {/* Glass Card */}
-    
-    
-  </div>
-)
+      <section className="relative z-10 w-full max-w-5xl px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 rounded-2xl overflow-hidden shadow-2xl">
+          {/* LEFT: Register Form */}
+          <div className="flex items-center justify-center lg:bg-white/10 lg:backdrop-blur-xl md:p-6 lg:p-10">
+            <Card
+              className="
+                w-full max-w-sm
+                rounded-2xl
+                border border-white/20
+                bg-white/12 dark:bg-black/20
+                backdrop-blur-[10px]
+              "
+            >
+              <CardHeader className="space-y-1 text-center">
+                <CardTitle className="text-xl sm:text-2xl font-semibold text-gray-300">Create Account</CardTitle>
+                <CardDescription className="text-gray-200">Enter your details to create a new account</CardDescription>
+              </CardHeader>
+
+              <CardContent>
+        <form onSubmit={handleRegister} className="space-y-4">
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {/* Email */}
+          <div className="space-y-1">
+            <Label className="text-white/80">Email *</Label>
+            <Input
+              className="
+                bg-white/20
+                border-white/20
+                text-white
+                placeholder:text-white/50
+                focus-visible:ring-primary
+              "
+              id="email"
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              disabled={isRegistering}
+            />
+          </div>
+
+          {/* Name */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <Label className="text-white/80">First Name *</Label>
+              <Input
+                className="
+                  bg-white/20
+                  border-white/20
+                  text-white
+                  placeholder:text-white/50
+                "
+                id="firstName"
+                type="text"
+                placeholder="John"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                required
+                disabled={isRegistering}
+              />
+            </div>
+
+            <div className="space-y-1">
+              <Label className="text-white/80">Last Name *</Label>
+              <Input
+                className="
+                  bg-white/20
+                  border-white/20
+                  text-white
+                  placeholder:text-white/50
+                "
+                id="lastName"
+                type="text"
+                placeholder="Doe"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                required
+                disabled={isRegistering}
+              />
+            </div>
+          </div>
+
+          {/* Date of Birth */}
+          <div className="space-y-1">
+            <Label className="text-white/80">Date of Birth *</Label>
+            <Input
+              className="
+                bg-white/20
+                border-white/20
+                text-white
+              "
+              id="dateOfBirth"
+              type="date"
+              value={dateOfBirth}
+              onChange={(e) => setDateOfBirth(e.target.value)}
+              required
+              disabled={isRegistering}
+            />
+          </div>
+
+          {/* Password */}
+          <div className="space-y-1">
+            <Label className="text-white/80">Password *</Label>
+            <Input
+              className="
+                bg-white/20
+                border-white/20
+                text-white
+                placeholder:text-white/50
+              "
+              id="password"
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              disabled={isRegistering}
+            />
+          </div>
+
+          {/* Confirm Password */}
+          <div className="space-y-1">
+            <Label className="text-white/80">Confirm Password *</Label>
+            <Input
+              className="
+                bg-white/20
+                border-white/20
+                text-white
+                placeholder:text-white/50
+              "
+              id="confirmPassword"
+              type="password"
+              placeholder="••••••••"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              disabled={isRegistering}
+            />
+          </div>
+
+          {/* Submit */}
+          <Button
+            type="submit"
+            disabled={isRegistering}
+            className="
+              w-full
+              rounded-lg
+              
+            "
+          >
+            {isRegistering ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Creating account...
+              </>
+            ) : (
+              <>
+                <Mail className="mr-2 h-4 w-4" />
+                Register
+              </>
+            )}
+          </Button>
+        </form>
+      </CardContent>
+
+      <CardFooter className="justify-center">
+        <p className="text-xs text-white/60">
+          Already have an account?{" "}
+          <Link href="/login" className="text-primary hover:underline">
+            Login
+          </Link>
+        </p>
+      </CardFooter>
+      
+    </Card>
+          </div>
+
+          {/* RIGHT: Image (Desktop only, high quality & optimized) */}
+          <div className="hidden lg:block relative">
+            <div className="relative min-h-[700px] isolate">
+              <Image
+                src="/auth/test2.jpg"
+                alt="Register illustration"
+                fill
+                priority
+                quality={100}
+                unoptimized
+                sizes="(min-width: 1024px) 50vw, 0vw"
+                className="object-cover object-fit opacity-100"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  )
 }
+
+
+
