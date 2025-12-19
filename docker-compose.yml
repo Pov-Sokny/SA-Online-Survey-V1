@@ -1,0 +1,18 @@
+services:
+  # ... your backend and oracle services ...
+
+  frontend:
+    container_name: 'sa-frontend'
+    image: asia-east1-docker.pkg.dev/strong-summer-481511-s6/my-survey-repo/frontend:v1
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      # This tells your Next.js where the API is
+      - NEXT_PUBLIC_API_URL=https://sa-api.supersurvey.live/api/v1
+    networks:
+      - survey-network
