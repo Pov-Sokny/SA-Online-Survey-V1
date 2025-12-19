@@ -1,6 +1,4 @@
 services:
-  # ... your backend and oracle services ...
-
   frontend:
     container_name: 'sa-frontend'
     image: asia-east1-docker.pkg.dev/strong-summer-481511-s6/my-survey-repo/frontend:v1
@@ -16,3 +14,7 @@ services:
       - NEXT_PUBLIC_API_URL=https://sa-api.supersurvey.live/api/v1
     networks:
       - survey-network
+
+networks:
+  survey-network:
+    external: true
