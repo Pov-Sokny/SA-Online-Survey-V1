@@ -118,168 +118,168 @@ export function RegisterForm() {
               </CardHeader>
 
               <CardContent>
-        <form onSubmit={handleRegister} className="space-y-4">
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
+                <form onSubmit={handleRegister} className="space-y-4">
+                  {error && (
+                    <Alert variant="destructive">
+                      <AlertDescription>{error}</AlertDescription>
+                    </Alert>
+                  )}
 
-          {/* Email */}
-          <div className="space-y-1">
-            <Label className="text-white/80">Email *</Label>
-            <Input
-              className="
+                  {/* Email */}
+                  <div className="space-y-1">
+                    <Label className="text-white/80">Email *</Label>
+                    <Input
+                      className="
                 bg-white/20
                 border-white/20
                 text-white
                 placeholder:text-white/50
                 focus-visible:ring-primary
               "
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              disabled={isRegistering}
-            />
-          </div>
+                      id="email"
+                      type="email"
+                      placeholder="you@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      disabled={isRegistering}
+                    />
+                  </div>
 
-          {/* Name */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <Label className="text-white/80">First Name *</Label>
-              <Input
-                className="
+                  {/* Name */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <Label className="text-white/80">First Name *</Label>
+                      <Input
+                        className="
                   bg-white/20
                   border-white/20
                   text-white
                   placeholder:text-white/50
                 "
-                id="firstName"
-                type="text"
-                placeholder="John"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                required
-                disabled={isRegistering}
-              />
-            </div>
+                        id="firstName"
+                        type="text"
+                        placeholder="John"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        required
+                        disabled={isRegistering}
+                      />
+                    </div>
 
-            <div className="space-y-1">
-              <Label className="text-white/80">Last Name *</Label>
-              <Input
-                className="
+                    <div className="space-y-1">
+                      <Label className="text-white/80">Last Name *</Label>
+                      <Input
+                        className="
                   bg-white/20
                   border-white/20
                   text-white
                   placeholder:text-white/50
                 "
-                id="lastName"
-                type="text"
-                placeholder="Doe"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                required
-                disabled={isRegistering}
-              />
-            </div>
-          </div>
+                        id="lastName"
+                        type="text"
+                        placeholder="Doe"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        required
+                        disabled={isRegistering}
+                      />
+                    </div>
+                  </div>
 
-          {/* Date of Birth */}
-          <div className="space-y-1">
-            <Label className="text-white/80">Date of Birth *</Label>
-            <Input
-              className="
+                  {/* Date of Birth */}
+                  <div className="space-y-1">
+                    <Label className="text-white/80">Date of Birth *</Label>
+                    <Input
+                      className="
                 bg-white/20
                 border-white/20
                 text-white
               "
-              id="dateOfBirth"
-              type="date"
-              value={dateOfBirth}
-              onChange={(e) => setDateOfBirth(e.target.value)}
-              required
-              disabled={isRegistering}
-            />
-          </div>
+                      id="dateOfBirth"
+                      type="date"
+                      value={dateOfBirth}
+                      onChange={(e) => setDateOfBirth(e.target.value)}
+                      required
+                      disabled={isRegistering}
+                    />
+                  </div>
 
-          {/* Password */}
-          <div className="space-y-1">
-            <Label className="text-white/80">Password *</Label>
-            <Input
-              className="
-                bg-white/20
-                border-white/20
-                text-white
-                placeholder:text-white/50
-              "
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              disabled={isRegistering}
-            />
-          </div>
-
-          {/* Confirm Password */}
-          <div className="space-y-1">
-            <Label className="text-white/80">Confirm Password *</Label>
-            <Input
-              className="
+                  {/* Password */}
+                  <div className="space-y-1">
+                    <Label className="text-white/80">Password *</Label>
+                    <Input
+                      className="
                 bg-white/20
                 border-white/20
                 text-white
                 placeholder:text-white/50
               "
-              id="confirmPassword"
-              type="password"
-              placeholder="••••••••"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-              disabled={isRegistering}
-            />
-          </div>
+                      id="password"
+                      type="password"
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      disabled={isRegistering}
+                    />
+                  </div>
 
-          {/* Submit */}
-          <Button
-            type="submit"
-            disabled={isRegistering}
-            className="
+                  {/* Confirm Password */}
+                  <div className="space-y-1">
+                    <Label className="text-white/80">Confirm Password *</Label>
+                    <Input
+                      className="
+                bg-white/20
+                border-white/20
+                text-white
+                placeholder:text-white/50
+              "
+                      id="confirmPassword"
+                      type="password"
+                      placeholder="••••••••"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                      disabled={isRegistering}
+                    />
+                  </div>
+
+                  {/* Submit */}
+                  <Button
+                    type="submit"
+                    disabled={isRegistering}
+                    className="
               w-full
               rounded-lg
               
             "
-          >
-            {isRegistering ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Creating account...
-              </>
-            ) : (
-              <>
-                <Mail className="mr-2 h-4 w-4" />
-                Register
-              </>
-            )}
-          </Button>
-        </form>
-      </CardContent>
+                  >
+                    {isRegistering ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Creating account...
+                      </>
+                    ) : (
+                      <>
+                        <Mail className="mr-2 h-4 w-4" />
+                        Register
+                      </>
+                    )}
+                  </Button>
+                </form>
+              </CardContent>
 
-      <CardFooter className="justify-center">
-        <p className="text-xs text-white/60">
-          Already have an account?{" "}
-          <Link href="/login" className="text-primary hover:underline">
-            Login
-          </Link>
-        </p>
-      </CardFooter>
-      
-    </Card>
+              <CardFooter className="justify-center">
+                <p className="text-xs text-white/60">
+                  Already have an account?{" "}
+                  <Link href="/login" className="text-primary hover:underline">
+                    Login
+                  </Link>
+                </p>
+              </CardFooter>
+
+            </Card>
           </div>
 
           {/* RIGHT: Image (Desktop only, high quality & optimized) */}
