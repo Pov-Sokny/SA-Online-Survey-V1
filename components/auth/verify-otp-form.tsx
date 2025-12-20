@@ -49,24 +49,15 @@ export function VerifyOtpForm() {
     try {
       const result = await verifyOtp({ email, token: otp }).unwrap()
 
+      // Show success message
       setSuccess(result.message || "Email verified successfully!")
 
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      // Small delay for UX
+      await new Promise((resolve) => setTimeout(resolve, 300))
 
-      if (result.user) {
-        dispatch(setCredentials({ user: result.user }))
-        router.push("/dashboard")
-      } else {
-        try {
-          const userData = await dispatch(authApi.endpoints.getCurrentUser.initiate()).unwrap()
-          if (userData) {
-            dispatch(setCredentials({ user: userData }))
-            router.push("/dashboard")
-          }
-        } catch {
-          router.push("/login")
-        }
-      }
+      // ✅ ALWAYS redirect to login after success
+      router.push("/login")
+
     } catch (err: any) {
       if (err.status === 400) {
         const errorMsg = err?.data?.message || "Invalid or expired OTP"
