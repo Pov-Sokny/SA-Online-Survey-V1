@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 import type { BaseQueryFn, FetchArgs, FetchBaseQueryError } from "@reduxjs/toolkit/query"
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://aa7ea781de46.ngrok-free.app/api/v1"
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://sa-api.supersurvey.live/api/v1"
 
 export interface LoginRequest {
   username?: string
