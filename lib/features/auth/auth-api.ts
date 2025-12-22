@@ -18,6 +18,10 @@ export interface RegisterRequest {
   password: string
   name?: string
   username?: string
+  firstName?: string
+  lastName?: string
+  dateOfBirth?: string
+  confirmPassword: string
 }
 
 export interface RegisterResponse {
