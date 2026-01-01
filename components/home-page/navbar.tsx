@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 
 export function Navbar() {
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-4 bg-white/80 backdrop-blur-md border-b border-gray-100">
+    <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-4 bg-white/50 backdrop-blur-[10px] shadow-sm shadow-gray-100b border-b border-gray-100">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Image src="/logo.jpg" alt="Supersuvey logo" width={36} height={36} className="rounded-lg" />
