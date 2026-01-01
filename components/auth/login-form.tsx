@@ -16,6 +16,9 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2 } from "lucide-react"
 import Image from "next/image"
 
+// import NextImage from "next/image";
+// import {Image} from "@heroui/react";
+
 export function LoginForm() {
   const router = useRouter()
   const dispatch = useAppDispatch()
@@ -83,7 +86,8 @@ export function LoginForm() {
       bg-cover bg-center bg-no-repeat
     "
       style={{
-        backgroundImage: "url('/auth/login1.jpg')",
+        // backgroundImage: "url('/auth/login1.jpg')",
+        backgroundImage: "url('https://resource.supersurvey.live/api/v1/files/view/454e0af5-8485-44ab-a8fb-433d47ce1712.jpg')",
       }}
     >
       {/* Dark / gradient overlay for readability */}
@@ -94,8 +98,17 @@ export function LoginForm() {
           {/* LEFT: Image (Desktop only, clear & optimized) */}
           <div className="hidden lg:block relative">
             <div className="hidden lg:block relative min-h-[520px] isolate">
+              {/* <Image
+                // as={NextImage}
+                src="https://resource.supersurvey.live/api/v1/files/view/c60f5f54-9975-4161-86b4-53ab1b83b61b.jpg"
+                alt="Login illustration"
+                // fill
+                className="object-cover"
+                radius="none"
+              /> */}
               <Image
-                src="/auth/test1.jpg"
+                // src="/auth/test1.jpg"
+                src="https://resource.supersurvey.live/api/v1/files/view/c60f5f54-9975-4161-86b4-53ab1b83b61b.jpg"
                 alt="Login illustration"
                 fill
                 priority

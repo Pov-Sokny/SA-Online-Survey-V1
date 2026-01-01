@@ -3,6 +3,7 @@
 import { LoginForm } from "@/components/auth/login-form"
 import { LoginForm1 } from "@/components/auth/login-form1"
 import { LoginForm2 } from "@/components/auth/login-formt2"
+import Test1 from "@/components/Test"
 import { useAppSelector } from "@/lib/hooks"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
@@ -25,6 +26,7 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center">
       <LoginForm />
+      {/* <Test1 /> */}
     </div>
   )
 }
