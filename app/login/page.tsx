@@ -14,14 +14,13 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.push("/dashboard")
+      router.push("/create-survey")
     }
   }, [isAuthenticated, router])
 
   if (isAuthenticated) {
     return null
   }
-  // </CHANGE>
 
   return (
     <div className="flex min-h-screen items-center justify-center">

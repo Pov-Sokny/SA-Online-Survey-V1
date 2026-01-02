@@ -48,7 +48,7 @@ export function LoginForm() {
 
         if (result) {
           dispatch(setCredentials({ user: result }))
-          router.push("/dashboard")
+          router.push("/create-survey")
         } else {
           setError("Failed to fetch user data. Please try again.")
         }

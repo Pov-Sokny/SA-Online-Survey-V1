@@ -10,7 +10,7 @@ export function Navbar() {
           <Link href="/" className="flex items-center gap-2" >
             <Image src="/logo.jpg" alt="Supersuvey logo" width={36} height={36} className="rounded-lg" />
             <span className="font-bold text-xl text-brand-dark text-primary">Super Suvey</span>
-            </Link>
+          </Link>
         </div>
         <div className="hidden md:flex items-center gap-8">
           <Link href="#" className="text-sm font-medium hover:text-primary transition-colors">
