@@ -87,7 +87,7 @@ export function LoginForm() {
     "
       style={{
         // backgroundImage: "url('/auth/login1.jpg')",
-        backgroundImage: "url('https://resource.supersurvey.live/api/v1/files/view/454e0af5-8485-44ab-a8fb-433d47ce1712.jpg')",
+        backgroundImage: "url('https://resource.supersurvey.live/api/v1/files/view/33c1deec-ecd7-4bfc-92ef-733b5bbff876.jpg')",
       }}
     >
       {/* Dark / gradient overlay for readability */}
@@ -108,8 +108,8 @@ export function LoginForm() {
               /> */}
               <Image
                 // src="/auth/test1.jpg"
-                src="https://resource.supersurvey.live/api/v1/files/view/c60f5f54-9975-4161-86b4-53ab1b83b61b.jpg"
-                alt="Login illustration"
+                src="https://resource.supersurvey.live/api/v1/files/view/62a375e7-3b9d-4973-8f24-8398efbf3b3f.jpg"
+                alt="Login Image"
                 fill
                 priority
                 quality={100}
