@@ -1,22 +1,24 @@
 "use client"
 
 import { LoginForm } from "@/components/auth/login-form"
-import { LoginForm1 } from "@/components/auth/login-form1"
-import { LoginForm2 } from "@/components/auth/login-formt2"
-import Test1 from "@/components/Test"
 import { useAppSelector } from "@/lib/hooks"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 
 export default function LoginPage() {
   const router = useRouter()
-  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
+  const { isAuthenticated, user } = useAppSelector((state) => state.auth)
 
   useEffect(() => {
-    if (isAuthenticated) {
-      router.push("/create-survey")
+    if (isAuthenticated && user) {
+      const roles = user.roles || ""
+      if (roles.includes("ADMIN")) {
+        router.push("/admin")
+      } else {
+        router.push("/user")
+      }
     }
-  }, [isAuthenticated, router])
+  }, [isAuthenticated, user, router])
 
   if (isAuthenticated) {
     return null

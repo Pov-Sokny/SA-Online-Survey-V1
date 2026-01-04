@@ -41,14 +41,21 @@ export function LoginForm() {
 
       await login(credentials).unwrap()
 
-      await new Promise((resolve) => setTimeout(resolve, 100))
+      await new Promise((resolve) => setTimeout(resolve, 300))
 
       try {
-        const result = await dispatch(authApi.endpoints.getCurrentUser.initiate()).unwrap()
+        const result = await dispatch(
+          authApi.endpoints.getCurrentUser.initiate(undefined, { forceRefetch: true }),
+        ).unwrap()
 
         if (result) {
           dispatch(setCredentials({ user: result }))
-          router.push("/create-survey")
+          const userRoles = result.roles?.replace(/[[\]]/g, "") || ""
+          if (userRoles.includes("ADMIN")) {
+            router.push("/admin")
+          } else {
+            router.push("/user")
+          }
         } else {
           setError("Failed to fetch user data. Please try again.")
         }
@@ -87,7 +94,8 @@ export function LoginForm() {
     "
       style={{
         // backgroundImage: "url('/auth/login1.jpg')",
-        backgroundImage: "url('https://resource.supersurvey.live/api/v1/files/view/33c1deec-ecd7-4bfc-92ef-733b5bbff876.jpg')",
+        backgroundImage:
+          "url('https://resource.supersurvey.live/api/v1/files/view/33c1deec-ecd7-4bfc-92ef-733b5bbff876.jpg')",
       }}
     >
       {/* Dark / gradient overlay for readability */}

@@ -50,6 +50,7 @@ export interface User {
   email: string
   name?: string
   username?: string
+  roles?: string // Backend returns "[USER]" or "[ADMIN]" as a string
 }
 
 const baseQuery = fetchBaseQuery({
