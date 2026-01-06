@@ -95,7 +95,7 @@ export function LoginForm() {
       style={{
         // backgroundImage: "url('/auth/login1.jpg')",
         backgroundImage:
-          "url('https://resource.supersurvey.live/api/v1/files/view/33c1deec-ecd7-4bfc-92ef-733b5bbff876.jpg')",
+          "url('https://resource.supersurvey.live/api/v1/files/background/smooth?type=BGLOGIN')",
       }}
     >
       {/* Dark / gradient overlay for readability */}
@@ -114,16 +114,31 @@ export function LoginForm() {
                 className="object-cover"
                 radius="none"
               /> */}
-              <Image
+              {/* <Image
                 // src="/auth/test1.jpg"
-                src="https://resource.supersurvey.live/api/v1/files/view/62a375e7-3b9d-4973-8f24-8398efbf3b3f.jpg"
+                src="https://resource.supersurvey.live/api/v1/files/background/smooth?type=LOGIN"
+                alt="Login Image"
+                //fill
+                // priority
+                // quality={100}
+                // unoptimized
+                // placeholder="blur"
+                fill
+                priority
+                //placeholder="blur"
+                blurDataURL={'https://resource.supersurvey.live/api/v1/files/view/fc3009b3-1dc8-4938-9f44-1bb15aea7ff2.png'}
+                style={{ objectFit: 'cover' }}
+                sizes="(min-width: 1024px) 50vw, 0vw"
+                className="object-cover object-fit opacity-100"
+              /> */}
+              <Image
+                src="https://resource.supersurvey.live/api/v1/files/background/smooth?type=LOGIN"
                 alt="Login Image"
                 fill
                 priority
-                quality={100}
-                unoptimized
-                sizes="(min-width: 1024px) 50vw, 0vw"
-                className="object-cover object-fit opacity-100"
+                style={{ objectFit: 'cover' }}
+                sizes="(min-width: 1024px) 50vw, 100vw" // Changed 0vw to 100vw so it shows on mobile
+                className="opacity-100"
               />
               {/* <img src="./auth/login-image.jpg" alt=""  width={10000} height={1000}/> */}
             </div>

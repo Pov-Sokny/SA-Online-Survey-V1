@@ -94,7 +94,7 @@ export function RegisterForm() {
       "
       style={{
         // backgroundImage: "url('/auth/register1.jpg')",
-        backgroundImage: "url('https://resource.supersurvey.live/api/v1/files/view/3d8f7773-813e-4514-95c0-210fa7dd32b9.jpg')",
+        backgroundImage: "url('https://resource.supersurvey.live/api/v1/files/background?type=BGREGISTER')",
       }}
     >
       {/* Dark overlay for readability */}
@@ -288,7 +288,7 @@ export function RegisterForm() {
             <div className="relative min-h-[700px] isolate">
               <Image
                 // src="/auth/test2.jpg"
-                src="https://resource.supersurvey.live/api/v1/files/view/a915847b-dfb4-43a3-bb6a-2bbfbbfd1af3.jpg"
+                src="https://resource.supersurvey.live/api/v1/files/background/smooth?type=REGISTER"
                 alt="Register illustration"
                 fill
                 priority

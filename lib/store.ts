@@ -2,12 +2,16 @@ import { configureStore } from "@reduxjs/toolkit"
 import { setupListeners } from "@reduxjs/toolkit/query"
 import { authApi } from "./features/auth/auth-api"
 import authReducer from "./features/auth/auth-slice"
+import { filesApi } from "./features/files/files-api"
+import filesReducer from "./features/files/files-slice"
 
 export const makeStore = () => {
   const store = configureStore({
     reducer: {
       [authApi.reducerPath]: authApi.reducer,
       auth: authReducer,
+      [filesApi.reducerPath]: filesApi.reducer,
+      files: filesReducer,
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(authApi.middleware),
   })
