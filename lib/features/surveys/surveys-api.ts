@@ -15,6 +15,17 @@ export interface SurveyResponse {
   createdAt?: string
 }
 
+export interface SurverResponeList {
+    uuid: string,
+    title: string,
+    description: string,
+    startDate: string,
+    closeDate: string,
+    isPublic: string,
+    isClosed: string,
+    surveyType: string
+}
+
 const baseQuery = fetchBaseQuery({
   baseUrl: API_BASE_URL,
   credentials: "include",
@@ -60,6 +71,12 @@ export const surveyApi = createApi({
         credentials: "include",
       }),
       invalidatesTags: ["Survey"],
+    }),
+    getAllSurverys: builder.query<SurverResponeList, { type: string }>({
+        query: ({ type }) => ({
+            url: `/files/background?type=${type}`,
+        }),
+        invalidatesTags: ["Survey"],
     }),
   }),
 })
