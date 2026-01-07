@@ -4,6 +4,7 @@ import type React from "react"
 import { ProtectedRoute } from "@/components/auth/protected-route"
 import { Sidebar } from "@/components/dahsboard/Sidebar"
 import { Header } from "@/components/dahsboard/Header"
+import { Toaster } from "sonner"
 
 export default function UserLayout({
   children,
@@ -27,6 +28,7 @@ export default function UserLayout({
           {/* Scrollable content */}
           <div className="flex-1 overflow-y-auto p-4">
             {children}
+            <Toaster position="top-right" richColors />
           </div>
         </main>
 

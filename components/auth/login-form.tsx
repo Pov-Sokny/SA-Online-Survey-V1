@@ -15,6 +15,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2 } from "lucide-react"
 import Image from "next/image"
+import { toast } from "sonner"
 
 // import NextImage from "next/image";
 // import {Image} from "@heroui/react";
@@ -43,6 +44,10 @@ export function LoginForm() {
 
       await new Promise((resolve) => setTimeout(resolve, 300))
 
+      toast.success("Survey created 🎉", {
+        description: "Your survey was created successfully",
+      })
+
       try {
         const result = await dispatch(
           authApi.endpoints.getCurrentUser.initiate(undefined, { forceRefetch: true }),
@@ -60,6 +65,12 @@ export function LoginForm() {
           setError("Failed to fetch user data. Please try again.")
         }
       } catch (fetchError: any) {
+        toast.error("Create survey failed", {
+          description:
+            fetchError?.data?.message ||
+            "Something went wrong",
+        })
+
         if (fetchError?.status === 401) {
           setError(
             "Authentication failed. Check backend Set-Cookie header includes: Path=/; HttpOnly; SameSite=None; Secure (for ngrok)",

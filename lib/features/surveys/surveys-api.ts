@@ -72,12 +72,12 @@ export const surveyApi = createApi({
       }),
       invalidatesTags: ["Survey"],
     }),
-    getAllSurverys: builder.query<SurverResponeList, { type: string }>({
-        query: ({ type }) => ({
-            url: `/files/background?type=${type}`,
-        }),
-        invalidatesTags: ["Survey"],
-    }),
+    // getAllSurverys: builder.query<SurverResponeList, { type: string }>({
+    //     query: ({ type }) => ({
+    //         url: `/files/background?type=${type}`,
+    //     }),
+    //     invalidatesTags: ["Survey"],
+    // }),
   }),
 })
 
