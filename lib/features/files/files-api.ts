@@ -1,13 +1,14 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
+import type { BackgroundFile } from "@/lib/types/file-type"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://sa-api.supersurvey.live/api/v1"
 
-export interface BackgroundFile {
-  id: string
-  url: string
-  name?: string
-  type?: string
-}
+// export interface BackgroundFile {
+//   id: string
+//   url: string
+//   name?: string
+//   type?: string
+// }
 
 const baseQuery = fetchBaseQuery({
   baseUrl: API_BASE_URL,

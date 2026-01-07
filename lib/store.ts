@@ -4,6 +4,8 @@ import { authApi } from "./features/auth/auth-api"
 import authReducer from "./features/auth/auth-slice"
 import { filesApi } from "./features/files/files-api"
 import filesReducer from "./features/files/files-slice"
+import surveyReducer from "./features/surveys/survey-slice"
+import { surveyApi } from "./features/surveys/surveys-api"
 
 export const makeStore = () => {
   const store = configureStore({
@@ -12,6 +14,8 @@ export const makeStore = () => {
       auth: authReducer,
       [filesApi.reducerPath]: filesApi.reducer,
       files: filesReducer,
+      [surveyApi.reducerPath]: surveyApi.reducer,
+      survey: surveyReducer,
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(authApi.middleware),
   })

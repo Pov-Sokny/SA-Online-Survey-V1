@@ -24,7 +24,7 @@ export default function UserPage() {
                         Welcome back, John! Here&apos;s what&apos;s happening with your surveys today.
                     </p>
                 </div>
-                <Link href="/surveys/new">
+                <Link href="/user/surveys/new">
                     <Button className="gap-2 bg-[#00a368] hover:bg-[#00a368]/90 shadow-sm">
                         <Plus className="h-4 w-4" />
                         Create New Survey
