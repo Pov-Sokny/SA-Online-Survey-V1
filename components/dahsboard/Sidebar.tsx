@@ -25,17 +25,17 @@ export function Sidebar() {
   const navItems = [
     {
       title: "Dashboard",
-      href: "/dashboard",
+      href: "/user",
       icon: Home,
     },
     {
       title: "My Surveys",
-      href: "/surveys",
+      href: "/user/surveys",
       icon: FileText,
     },
     {
       title: "Templates",
-      href: "/templates",
+      href: "/user/templates",
       icon: Layout,
     },
     {
