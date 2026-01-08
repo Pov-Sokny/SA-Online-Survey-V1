@@ -12,6 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, Mail } from "lucide-react"
 import Image from "next/image"
+import { toast } from "sonner"
 
 export function RegisterForm() {
   const router = useRouter()

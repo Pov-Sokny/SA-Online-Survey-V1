@@ -44,9 +44,11 @@ export function LoginForm() {
 
       await new Promise((resolve) => setTimeout(resolve, 300))
 
-      toast.success("Survey created 🎉", {
-        description: "Your survey was created successfully",
-      })
+      toast.success("Login successful 🎉", {
+      description: "Welcome back! bro/sis",
+     })
+
+
 
       try {
         const result = await dispatch(
@@ -65,12 +67,6 @@ export function LoginForm() {
           setError("Failed to fetch user data. Please try again.")
         }
       } catch (fetchError: any) {
-        toast.error("Create survey failed", {
-          description:
-            fetchError?.data?.message ||
-            "Something went wrong",
-        })
-
         if (fetchError?.status === 401) {
           setError(
             "Authentication failed. Check backend Set-Cookie header includes: Path=/; HttpOnly; SameSite=None; Secure (for ngrok)",
@@ -83,12 +79,45 @@ export function LoginForm() {
       if (err?.message?.includes("CORS") || err?.name === "TypeError") {
         setError("Connection blocked. Backend CORS must allow origin 'http://localhost:3000' with credentials: true")
       } else if (err.status === 401) {
-        setError("Invalid credentials. Please try again.")
+        /*setError("Invalid credentials. Please try again.")*/
+
+        toast.error("Login failed", {
+          description:
+            err?.data?.message ||
+            err?.error ||
+            "Invalid email or password",
+        })
+
       } else if (err.status === 404) {
-        setError("Login endpoint not found. Please contact support.")
+        /*setError("Login endpoint not found. Please contact support.")*/
+
+        toast.error("Login failed", {
+          description:
+            err?.data?.message ||
+            err?.error ||
+            "Login endpoint not found. Please contact support.",
+        })
+
       } else if (err.status === 500) {
-        setError("Server error. Please try again later.")
-      } else {
+        /*setError("Server error. Please try again later.")*/
+
+        toast.error("Login failed", {
+          description:
+            err?.data?.message ||
+            err?.error ||
+            "Server error. Please try again later.",
+        })
+
+      } else if (err.status === 503) {
+
+        toast.error("Login failed", {
+          description:
+            err?.data?.message ||
+            err?.error ||
+            "Server error. please contact",
+        })
+      }
+      else {
         const errorMessage =
           err?.data?.message || err?.data?.error || err?.error || "Login failed. Please check your credentials."
         setError(errorMessage)
