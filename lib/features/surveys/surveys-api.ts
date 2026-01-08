@@ -1,30 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 import type { BaseQueryFn, FetchArgs, FetchBaseQueryError } from "@reduxjs/toolkit/query"
+import type { SurveyRequest, SurveyResponse } from "@/lib/types/survey-type"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://sa-api.supersurvey.live/api/v1"
-
-export interface SurveyRequest {
-  title: string
-  description?: string
-}
-
-export interface SurveyResponse {
-  message: string
-  surveyId?: string
-  id?: string
-  createdAt?: string
-}
-
-export interface SurverResponeList {
-    uuid: string,
-    title: string,
-    description: string,
-    startDate: string,
-    closeDate: string,
-    isPublic: string,
-    isClosed: string,
-    surveyType: string
-}
 
 const baseQuery = fetchBaseQuery({
   baseUrl: API_BASE_URL,
