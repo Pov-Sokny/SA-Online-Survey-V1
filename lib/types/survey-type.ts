@@ -1,4 +1,3 @@
-
 export interface SurveyRequest {
   title: string
   description?: string
@@ -12,12 +11,17 @@ export interface SurveyResponse {
 }
 
 export interface SurverResponeList {
-    uuid: string,
-    title: string,
-    description: string,
-    startDate: string,
-    closeDate: string,
-    isPublic: string,
-    isClosed: string,
-    surveyType: string
+  uuid: string
+  title: string
+  description: string
+  startDate: string
+  closeDate: string
+  isPublic: string
+  isClosed: string
+  surveyType: string
+}
+
+export interface SurveyListResponse {
+  content: SurverResponeList[]
+  message?: string
 }

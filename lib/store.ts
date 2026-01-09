@@ -17,7 +17,8 @@ export const makeStore = () => {
       [surveyApi.reducerPath]: surveyApi.reducer,
       survey: surveyReducer,
     },
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(authApi.middleware),
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware().concat(authApi.middleware, filesApi.middleware, surveyApi.middleware),
   })
 
   setupListeners(store.dispatch)

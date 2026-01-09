@@ -8,7 +8,7 @@ import { MoreHorizontal, MessageSquare, Clock, Edit, Eye, Share2, Copy, Trash2, 
 import Link from "next/link"
 
 export interface Survey {
-  id: string
+  uuid: string
   title: string
   description: string
   status: "active" | "draft" | "closed"
@@ -59,12 +59,12 @@ export function SurveyCard({ survey, onDuplicate, onDelete, onArchive, onMove }:
 
         {/* Hover Overlay */}
         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-2">
-          <Link href={`/surveys/${survey.id}/edit`}>
+          <Link href={`/surveys/${survey.uuid}/edit`}>
             <Button variant="secondary" size="sm" className="bg-white/90 hover:bg-white">
               <Edit className="h-4 w-4 mr-1" /> Edit
             </Button>
           </Link>
-          <Link href={`/surveys/${survey.id}/preview`}>
+          <Link href={`/surveys/${survey.uuid}/preview`}>
             <Button variant="secondary" size="sm" className="bg-white/90 hover:bg-white">
               <Eye className="h-4 w-4 mr-1" /> Preview
             </Button>
@@ -75,7 +75,7 @@ export function SurveyCard({ survey, onDuplicate, onDelete, onArchive, onMove }:
       {/* Content Area */}
       <div className="p-4 flex-1 flex flex-col">
         <div className="flex justify-between items-start mb-2">
-          <Link href={`/surveys/${survey.id}/edit`} className="hover:text-[#00a368] transition-colors">
+          <Link href={`/surveys/${survey.uuid}/edit`} className="hover:text-[#00a368] transition-colors">
             <h3 className="font-semibold text-gray-900 line-clamp-1" title={survey.title}>
               {survey.title}
             </h3>

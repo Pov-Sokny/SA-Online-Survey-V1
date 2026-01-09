@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 import type { BaseQueryFn, FetchArgs, FetchBaseQueryError } from "@reduxjs/toolkit/query"
-import type { SurveyRequest, SurveyResponse } from "@/lib/types/survey-type"
+import type { SurveyRequest, SurveyResponse, SurverResponeList } from "@/lib/types/survey-type"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://sa-api.supersurvey.live/api/v1"
 
@@ -36,12 +36,16 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
   return result
 }
 
+interface SurveysContentResponse {
+  content: SurverResponeList[]
+}
+
 export const surveyApi = createApi({
   reducerPath: "surveyApi",
   baseQuery: baseQueryWithReauth,
   tagTypes: ["Survey"],
   endpoints: (builder) => ({
-    createSurvey: builder.mutation<SurveyResponse, SurveyRequest>({
+    createSurvey: builder.mutation<SurveysContentResponse, SurveyRequest>({
       query: (surveyData) => ({
         url: "/surveys",
         method: "POST",
@@ -50,13 +54,15 @@ export const surveyApi = createApi({
       }),
       invalidatesTags: ["Survey"],
     }),
-    // getAllSurverys: builder.query<SurverResponeList, { type: string }>({
-    //     query: ({ type }) => ({
-    //         url: `/files/background?type=${type}`,
-    //     }),
-    //     invalidatesTags: ["Survey"],
-    // }),
+    getSurveys: builder.query<SurveysContentResponse, void>({
+      query: () => ({
+        url: "/surveys/my-survey",
+        method: "POST",
+        credentials: "include",
+      }),
+      providesTags: ["Survey"],
+    }),
   }),
 })
 
-export const { useCreateSurveyMutation } = surveyApi
+export const { useCreateSurveyMutation, useGetSurveysQuery } = surveyApi

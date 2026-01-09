@@ -28,7 +28,9 @@ export function ProtectedRoute({ children, redirectTo = "/login", allowedRoles }
     isError,
     isFetching,
   } = useGetCurrentUserQuery(undefined, {
-    refetchOnMountOrArgChange: true,
+    refetchOnMountOrArgChange: false,
+    refetchOnFocus: false,
+    refetchOnReconnect: false,
   })
 
   useEffect(() => {

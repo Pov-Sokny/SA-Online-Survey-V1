@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Plus, Search, Filter, Grid, List, Upload, FolderInput, Trash2, Archive } from "lucide-react"
+import { Plus, Search, Filter, Grid, List, Upload, FolderInput, Trash2, Archive, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { SurveyCard, type Survey } from "@/components/surveys/SurveyCard"
 import { SurveyList } from "@/components/surveys/SurveyList"
@@ -14,52 +14,22 @@ import { DeleteConfirmDialog } from "@/components/surveys/DeleteConfirmDailog"
 import { ArchiveSurveyDialog } from "@/components/surveys/ArchiveSurveyDaillog"
 import { MoveSurveyDialog } from "@/components/surveys/MoveSurveyDailog"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, SelectSeparator } from "@/components/ui/select"
+import { useGetSurveysQuery } from "@/lib/features/surveys/surveys-api"
 
-// Mock Data
-const MOCK_SURVEYS: Survey[] = [
-  {
-    id: "1",
-    title: "Customer Satisfaction Survey 2023",
-    description: "Annual feedback from our premium customers regarding services.",
-    status: "active",
-    responses: 1243,
-    lastModified: "2 hours ago",
-    thumbnail: "/pasted-image.png",
-  },
-  {
-    id: "2",
-    title: "Employee Engagement Q3",
-    description: "Internal survey for engineering team health check.",
-    status: "draft",
-    responses: 0,
-    lastModified: "1 day ago",
-  },
-  {
-    id: "3",
-    title: "Product Market Fit",
-    description: "Research for the new feature launch in Q4.",
-    status: "active",
-    responses: 89,
-    lastModified: "3 days ago",
-  },
-  {
-    id: "4",
-    title: "Event Registration: Tech Summit",
-    description: "Registration form for the upcoming annual summit.",
-    status: "closed",
-    responses: 450,
-    lastModified: "1 week ago",
-  },
-  {
-    id: "5",
-    title: "Website Feedback",
-    description: "Ongoing collection of website usability issues.",
-    status: "active",
-    responses: 2341,
-    lastModified: "2 weeks ago",
-  },
-]
 export default function SurveysPage() {
+  const { data: surveysResponse, isLoading, error } = useGetSurveysQuery()
+
+  const surveys: Survey[] = useMemo(() => {
+    return (surveysResponse?.content || []).map((apiSurvey) => ({
+      uuid: apiSurvey.uuid,
+      title: apiSurvey.title,
+      description: apiSurvey.description,
+      status: apiSurvey.isClosed === "true" ? "closed" : apiSurvey.isPublic === "true" ? "active" : "draft",
+      responses: 0,
+      lastModified: apiSurvey.closeDate ? new Date(apiSurvey.closeDate).toLocaleDateString() : "Unknown",
+    }))
+  }, [surveysResponse])
+
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
   const [searchQuery, setSearchQuery] = useState("")
   const [activeFolder, setActiveFolder] = useState("all")
@@ -90,6 +60,7 @@ export default function SurveysPage() {
   const [moveDialog, setMoveDialog] = useState({
     isOpen: false,
   })
+
   const handleSelect = (id: string, checked: boolean) => {
     if (checked) {
       setSelectedIds([...selectedIds, id])
@@ -97,13 +68,15 @@ export default function SurveysPage() {
       setSelectedIds(selectedIds.filter((sid) => sid !== id))
     }
   }
+
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      setSelectedIds(MOCK_SURVEYS.map((s) => s.id))
+      setSelectedIds(surveys.map((s) => s.uuid))
     } else {
       setSelectedIds([])
     }
   }
+
   return (
     <div className="flex h-[calc(100vh-64px)] overflow-hidden">
       {/* Left Sidebar - Folder Organizer */}
@@ -227,11 +200,29 @@ export default function SurveysPage() {
 
         {/* Survey Content */}
         <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
-          {viewMode === "grid" ? (
+          {isLoading ? (
+            <div className="flex items-center justify-center h-full">
+              <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+            </div>
+          ) : error ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center">
+                <p className="text-gray-500 text-lg">Failed to load surveys</p>
+                <p className="text-gray-400 text-sm mt-2">Please try refreshing the page</p>
+              </div>
+            </div>
+          ) : surveys.length === 0 ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center">
+                <p className="text-gray-500 text-lg">No surveys yet</p>
+                <p className="text-gray-400 text-sm mt-2">Create your first survey to get started</p>
+              </div>
+            </div>
+          ) : viewMode === "grid" ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {MOCK_SURVEYS.map((survey) => (
+              {surveys.map((survey) => (
                 <SurveyCard
-                  key={survey.id}
+                  key={survey.uuid}
                   survey={survey}
                   onDuplicate={(s) =>
                     setDuplicateDialog({
@@ -261,7 +252,7 @@ export default function SurveysPage() {
             </div>
           ) : (
             <SurveyList
-              surveys={MOCK_SURVEYS}
+              surveys={surveys}
               selectedIds={selectedIds}
               onSelect={handleSelect}
               onSelectAll={handleSelectAll}
@@ -319,7 +310,7 @@ export default function SurveysPage() {
               survey: null,
             })
           }
-          onConfirm={() => console.log("Delete", deleteDialog.survey?.id)}
+          onConfirm={() => console.log("Delete", deleteDialog.survey?.uuid)}
           itemName={deleteDialog.survey.title}
         />
       )}
@@ -333,7 +324,7 @@ export default function SurveysPage() {
               survey: null,
             })
           }
-          onConfirm={() => console.log("Archive", archiveDialog.survey?.id)}
+          onConfirm={() => console.log("Archive", archiveDialog.survey?.uuid)}
           surveyTitle={archiveDialog.survey.title}
         />
       )}
