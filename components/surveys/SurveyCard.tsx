@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { MoreHorizontal, MessageSquare, Clock, Edit, Eye, Share2, Copy, Trash2, Archive } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 
 export interface Survey {
   uuid: string
@@ -14,7 +15,7 @@ export interface Survey {
   status: "active" | "draft" | "closed"
   responses: number
   lastModified: string
-  thumbnail?: string
+  thumbnail: "https://resource.supersurvey.live/api/v1/files/background/smooth?type=BGLOGIN"
   folderId?: string
 }
 
@@ -35,38 +36,44 @@ export function SurveyCard({ survey, onDuplicate, onDelete, onArchive, onMove }:
 
   return (
     <Card className="group hover:shadow-md transition-shadow duration-200 flex flex-col h-full overflow-hidden">
+
       {/* Thumbnail Area */}
-      <div className="h-32 bg-gray-100 relative border-b">
-        {survey.thumbnail ? (
-          <img src={survey.thumbnail || "/placeholder.svg"} alt="" className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gray-50">
-            <div className="w-3/4 h-3/4 bg-white shadow-sm rounded border p-2 opacity-50 transform scale-90">
-              <div className="h-2 w-1/2 bg-gray-200 rounded mb-2"></div>
-              <div className="h-2 w-3/4 bg-gray-200 rounded mb-4"></div>
-              <div className="space-y-2">
-                <div className="h-2 w-full bg-gray-100 rounded"></div>
-                <div className="h-2 w-full bg-gray-100 rounded"></div>
-              </div>
-            </div>
-          </div>
-        )}
-        <div className="absolute top-2 right-2">
+      <div className="relative h-32 w-full overflow-hidden border-b bg-gray-100">
+        <Image
+          src="https://resource.supersurvey.live/api/v1/files/background/smooth?type=BGLOGIN"
+          alt="Survey thumbnail"
+          fill
+          unoptimized
+          priority
+          className="object-cover"
+        />
+
+        {/* Status Badge */}
+        <div className="absolute top-2 right-2 z-10">
           <Badge className={statusColors[survey.status]}>
             {survey.status.charAt(0).toUpperCase() + survey.status.slice(1)}
           </Badge>
         </div>
 
-        {/* Hover Overlay */}
-        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-2">
+        {/* Hover Actions */}
+        <div className="absolute inset-0 z-10 flex items-center justify-center gap-2 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
           <Link href={`/surveys/${survey.uuid}/edit`}>
-            <Button variant="secondary" size="sm" className="bg-white/90 hover:bg-white">
-              <Edit className="h-4 w-4 mr-1" /> Edit
+            <Button
+              size="sm"
+              variant="secondary"
+              className="bg-white/90 hover:bg-white"
+            >
+              Edit
             </Button>
           </Link>
+
           <Link href={`/surveys/${survey.uuid}/preview`}>
-            <Button variant="secondary" size="sm" className="bg-white/90 hover:bg-white">
-              <Eye className="h-4 w-4 mr-1" /> Preview
+            <Button
+              size="sm"
+              variant="secondary"
+              className="bg-white/90 hover:bg-white"
+            >
+              Preview
             </Button>
           </Link>
         </div>
