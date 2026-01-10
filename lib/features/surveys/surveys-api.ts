@@ -54,14 +54,22 @@ export const surveyApi = createApi({
       }),
       invalidatesTags: ["Survey"],
     }),
-    getSurveys: builder.query<SurveysContentResponse, void>({
-      query: () => ({
+    getSurveys: builder.query<
+      SurveysContentResponse,
+      { sortBy?: string; orderBy?: "ASC" | "DESC" }
+    >({
+      query: ({ sortBy = "title", orderBy = "ASC" } = {}) => ({
         url: "/surveys/my-survey",
         method: "POST",
+        params: {
+          sortBy,
+          orderBy,
+        },
         credentials: "include",
       }),
       providesTags: ["Survey"],
     }),
+
   }),
 })
 
