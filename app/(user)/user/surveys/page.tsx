@@ -37,6 +37,9 @@ import { useGetSurveysQuery } from "@/lib/features/surveys/surveys-api"
 
 import { LuArrowDownNarrowWide, LuArrowUpWideNarrow } from "react-icons/lu";
 
+import { useDebounce } from "@/components/dahsboard/useDebounce"
+
+
 /* ---------------- Types ---------------- */
 type ViewMode = "grid" | "list"
 type SortField = "title" | "createdDate" | "lastModifiedDate" | "totalResponse"
@@ -61,11 +64,16 @@ export default function SurveysPage() {
   const [archiveSurvey, setArchiveSurvey] = useState<Survey | null>(null)
   const [isMoveOpen, setIsMoveOpen] = useState(false)
 
+    const debouncedSearch = useDebounce(searchQuery, 1000)
+
   /* ---------- API ---------- */
   const { data, isLoading, error } = useGetSurveysQuery({
-    sortBy,
-    orderBy,
-  })
+  sortBy,
+  orderBy,
+  title_like: debouncedSearch || undefined,
+})
+
+
 
   /* ---------- Normalize API Data ---------- */
   const surveys: Survey[] = useMemo(() => {
@@ -140,6 +148,14 @@ export default function SurveysPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                >
+                  ✕
+                </button>
+              )}
             </div>
 
             {/* Controls */}

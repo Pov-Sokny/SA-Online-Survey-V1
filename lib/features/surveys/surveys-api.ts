@@ -56,19 +56,25 @@ export const surveyApi = createApi({
     }),
     getSurveys: builder.query<
       SurveysContentResponse,
-      { sortBy?: string; orderBy?: "ASC" | "DESC" }
+      {
+        sortBy?: string
+        orderBy?: "ASC" | "DESC"
+        title_like?: string
+      }
     >({
-      query: ({ sortBy = "title", orderBy = "ASC" } = {}) => ({
+      query: ({ sortBy = "title", orderBy = "ASC", title_like } = {}) => ({
         url: "/surveys/my-survey",
-        method: "POST",
+        method: "POST", 
         params: {
           sortBy,
           orderBy,
+          ...(title_like ? { title_like } : {}), // 👈 only send if exists
         },
         credentials: "include",
       }),
       providesTags: ["Survey"],
     }),
+
 
   }),
 })
