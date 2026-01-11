@@ -9,9 +9,6 @@ import {
   Grid,
   List,
   Upload,
-  FolderInput,
-  Trash2,
-  Archive,
   Loader2,
 } from "lucide-react"
 
@@ -38,9 +35,12 @@ import { MoveSurveyDialog } from "@/components/surveys/MoveSurveyDailog"
 
 import { useGetSurveysQuery } from "@/lib/features/surveys/surveys-api"
 
+import { LuArrowDownNarrowWide, LuArrowUpWideNarrow } from "react-icons/lu";
+
 /* ---------------- Types ---------------- */
-type SortKey = "recent" | "name_asc" | "name_desc"
 type ViewMode = "grid" | "list"
+type SortField = "title" | "createdDate" | "lastModifiedDate" | "totalResponse"
+type SortOrder = "ASC" | "DESC"
 
 /* ---------------- Page ---------------- */
 export default function SurveysPage() {
@@ -50,26 +50,16 @@ export default function SurveysPage() {
   const [activeFolder, setActiveFolder] = useState("all")
   const [isFiltersOpen, setIsFiltersOpen] = useState(false)
   const [selectedIds, setSelectedIds] = useState<string[]>([])
-  const [sortKey, setSortKey] = useState<SortKey>("recent")
+
+  /* ---------- Sorting ---------- */
+  const [sortBy, setSortBy] = useState<SortField>("createdDate")
+  const [orderBy, setOrderBy] = useState<SortOrder>("DESC")
 
   /* ---------- Dialog State ---------- */
   const [duplicateSurvey, setDuplicateSurvey] = useState<Survey | null>(null)
   const [deleteSurvey, setDeleteSurvey] = useState<Survey | null>(null)
   const [archiveSurvey, setArchiveSurvey] = useState<Survey | null>(null)
   const [isMoveOpen, setIsMoveOpen] = useState(false)
-
-  /* ---------- Sort Mapping ---------- */
-  const { sortBy, orderBy } = useMemo(() => {
-    switch (sortKey) {
-      case "name_asc":
-        return { sortBy: "title", orderBy: "ASC" }
-      case "name_desc":
-        return { sortBy: "title", orderBy: "DESC" }
-      case "recent":
-      default:
-        return { sortBy: "createdDate", orderBy: "DESC" }
-    }
-  }, [sortKey])
 
   /* ---------- API ---------- */
   const { data, isLoading, error } = useGetSurveysQuery({
@@ -89,9 +79,9 @@ export default function SurveysPage() {
           : s.isPublic === "true"
           ? "active"
           : "draft",
-      responses: 0,
-      lastModified: s.closeDate
-        ? new Date(s.closeDate).toLocaleDateString()
+      responses: s.totalResponse ?? 0,
+      lastModified: s.lastModifiedDate
+        ? new Date(s.lastModifiedDate).toLocaleDateString()
         : "Unknown",
       thumbnail:
         "https://resource.supersurvey.live/api/v1/files/background/smooth?type=BGLOGIN",
@@ -154,36 +144,53 @@ export default function SurveysPage() {
 
             {/* Controls */}
             <div className="flex items-center gap-3">
-              <Button
-                variant="outline"
-                onClick={() => setIsFiltersOpen(true)}
-              >
+              <Button variant="outline" onClick={() => setIsFiltersOpen(true)}>
                 <Filter className="h-4 w-4" />
               </Button>
 
-              <Select value={sortKey} onValueChange={(v) => setSortKey(v as SortKey)}>
-                <SelectTrigger className="w-40">
-                  <SelectValue />
+              {/* Sort Field */}
+              <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortField)}>
+                <SelectTrigger className="w-44">
+                  <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="recent">Title</SelectItem>
+                  <SelectItem value="title">Title</SelectItem>
                   <SelectSeparator />
-                  <SelectItem value="name_asc">Created date</SelectItem>
+                  <SelectItem value="createdDate">Created Date</SelectItem>
                   <SelectSeparator />
-                  <SelectItem value="name_desc">lastModifiedDate</SelectItem>
+                  <SelectItem value="lastModifiedDate">Last Modified</SelectItem>
+                  <SelectSeparator />
+                  <SelectItem value="totalResponse">Total Responses</SelectItem>
                 </SelectContent>
               </Select>
 
+              {/* Order */}
+              <Select value={orderBy} onValueChange={(v) => setOrderBy(v as SortOrder)}>
+                <SelectTrigger className="w-28">
+                  <SelectValue placeholder="Order" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ASC">ASC <LuArrowDownNarrowWide size={60} /></SelectItem>
+                  <SelectSeparator />
+                  <SelectItem value="DESC">DESC <LuArrowUpWideNarrow /></SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* View Mode */}
               <div className="flex bg-gray-100 rounded-lg p-1">
                 <button
                   onClick={() => setViewMode("grid")}
-                  className={`p-2 rounded ${viewMode === "grid" && "bg-white shadow"}`}
+                  className={`p-2 rounded ${
+                    viewMode === "grid" ? "bg-white shadow" : ""
+                  }`}
                 >
                   <Grid className="h-4 w-4" />
                 </button>
                 <button
                   onClick={() => setViewMode("list")}
-                  className={`p-2 rounded ${viewMode === "list" && "bg-white shadow"}`}
+                  className={`p-2 rounded ${
+                    viewMode === "list" ? "bg-white shadow" : ""
+                  }`}
                 >
                   <List className="h-4 w-4" />
                 </button>
@@ -212,8 +219,8 @@ export default function SurveysPage() {
             </div>
           )}
 
-          {!isLoading && surveys.length > 0 && (
-            viewMode === "grid" ? (
+          {!isLoading && surveys.length > 0 &&
+            (viewMode === "grid" ? (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
                 {surveys.map((s) => (
                   <SurveyCard
@@ -236,8 +243,7 @@ export default function SurveysPage() {
                 onDelete={setDeleteSurvey}
                 onArchive={setArchiveSurvey}
               />
-            )
-          )}
+            ))}
         </div>
       </div>
 
