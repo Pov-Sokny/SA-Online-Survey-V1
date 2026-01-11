@@ -36,8 +36,16 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
   return result
 }
 
+interface PageInfo {
+  size: number
+  number: number
+  totalElements: number
+  totalPages: number
+}
+
 interface SurveysContentResponse {
   content: SurverResponeList[]
+  page: PageInfo
 }
 
 export const surveyApi = createApi({
@@ -60,21 +68,30 @@ export const surveyApi = createApi({
         sortBy?: string
         orderBy?: "ASC" | "DESC"
         title_like?: string
+        pageSize?: number
+        pageNumber?: number
       }
     >({
-      query: ({ sortBy = "title", orderBy = "ASC", title_like } = {}) => ({
+      query: ({
+        sortBy = "title",
+        orderBy = "ASC",
+        title_like,
+        pageSize = 10,
+        pageNumber = 1,
+      } = {}) => ({
         url: "/surveys/my-survey",
         method: "POST", 
         params: {
           sortBy,
           orderBy,
-          ...(title_like ? { title_like } : {}), // 👈 only send if exists
+          pageSize,
+          pageNumber,
+          ...(title_like ? { title_like } : {}),
         },
         credentials: "include",
       }),
       providesTags: ["Survey"],
     }),
-
 
   }),
 })

@@ -11,7 +11,6 @@ import {
   Upload,
   Loader2,
 } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -22,22 +21,27 @@ import {
   SelectItem,
   SelectSeparator,
 } from "@/components/ui/select"
-
 import { SurveyCard, type Survey } from "@/components/surveys/SurveyCard"
 import { SurveyList } from "@/components/surveys/SurveyList"
 import { FolderOrganizer } from "@/components/surveys/FolderOrganizer"
 import { SurveyFilters } from "@/components/surveys/SurveFilters"
-
 import { DuplicateSurveyDialog } from "@/components/surveys/DuplicateSurveyDailog"
 import { DeleteConfirmDialog } from "@/components/surveys/DeleteConfirmDailog"
 import { ArchiveSurveyDialog } from "@/components/surveys/ArchiveSurveyDaillog"
 import { MoveSurveyDialog } from "@/components/surveys/MoveSurveyDailog"
-
 import { useGetSurveysQuery } from "@/lib/features/surveys/surveys-api"
-
 import { LuArrowDownNarrowWide, LuArrowUpWideNarrow } from "react-icons/lu";
-
 import { useDebounce } from "@/components/dahsboard/useDebounce"
+import { useEffect } from "react"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
 
 
 /* ---------------- Types ---------------- */
@@ -63,17 +67,25 @@ export default function SurveysPage() {
   const [deleteSurvey, setDeleteSurvey] = useState<Survey | null>(null)
   const [archiveSurvey, setArchiveSurvey] = useState<Survey | null>(null)
   const [isMoveOpen, setIsMoveOpen] = useState(false)
+  const debouncedSearch = useDebounce(searchQuery, 1000)
+  const [pageNumber, setPageNumber] = useState(1)
+  const pageSize = 8
 
-    const debouncedSearch = useDebounce(searchQuery, 1000)
+  useEffect(() => {
+    setPageNumber(1)
+  }, [debouncedSearch, sortBy, orderBy])
+
 
   /* ---------- API ---------- */
   const { data, isLoading, error } = useGetSurveysQuery({
-  sortBy,
-  orderBy,
-  title_like: debouncedSearch || undefined,
-})
+    sortBy,
+    orderBy,
+    title_like: debouncedSearch || undefined,
+    pageSize,
+    pageNumber,
+  })
 
-
+  const pageInfo = data?.page
 
   /* ---------- Normalize API Data ---------- */
   const surveys: Survey[] = useMemo(() => {
@@ -85,8 +97,8 @@ export default function SurveysPage() {
         s.isClosed === "true"
           ? "closed"
           : s.isPublic === "true"
-          ? "active"
-          : "draft",
+            ? "active"
+            : "draft",
       responses: s.totalResponse ?? 0,
       lastModified: s.lastModifiedDate
         ? new Date(s.lastModifiedDate).toLocaleDateString()
@@ -196,17 +208,15 @@ export default function SurveysPage() {
               <div className="flex bg-gray-100 rounded-lg p-1">
                 <button
                   onClick={() => setViewMode("grid")}
-                  className={`p-2 rounded ${
-                    viewMode === "grid" ? "bg-white shadow" : ""
-                  }`}
+                  className={`p-2 rounded ${viewMode === "grid" ? "bg-white shadow" : ""
+                    }`}
                 >
                   <Grid className="h-4 w-4" />
                 </button>
                 <button
                   onClick={() => setViewMode("list")}
-                  className={`p-2 rounded ${
-                    viewMode === "list" ? "bg-white shadow" : ""
-                  }`}
+                  className={`p-2 rounded ${viewMode === "list" ? "bg-white shadow" : ""
+                    }`}
                 >
                   <List className="h-4 w-4" />
                 </button>
@@ -261,6 +271,61 @@ export default function SurveysPage() {
               />
             ))}
         </div>
+        
+        {/* Pagination */}
+        {pageInfo && pageInfo.totalPages > 1 && (
+          <div className="flex justify-center mt-8">
+            <Pagination>
+              <PaginationContent>
+                {/* Previous */}
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={() =>
+                      setPageNumber((p) => Math.max(1, p - 1))
+                    }
+                    className={
+                      pageNumber === 1 ? "pointer-events-none opacity-50" : ""
+                    }
+                  />
+                </PaginationItem>
+
+                {/* Page Numbers */}
+                {Array.from({ length: pageInfo.totalPages }).map((_, i) => {
+                  const page = i + 1
+                  return (
+                    <PaginationItem key={page}>
+                      <PaginationLink
+                        isActive={page === pageNumber}
+                        onClick={() => setPageNumber(page)}
+                        className="cursor-pointer"
+                      >
+                        {page}
+                      </PaginationLink>
+                    </PaginationItem>
+                  )
+                })}
+
+                {/* Next */}
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() =>
+                      setPageNumber((p) =>
+                        Math.min(pageInfo.totalPages, p + 1),
+                      )
+                    }
+                    className={
+                      pageNumber === pageInfo.totalPages
+                        ? "pointer-events-none opacity-50"
+                        : ""
+                    }
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+
+          </div>
+        )}
+
       </div>
 
       {/* Dialogs */}
@@ -271,7 +336,7 @@ export default function SurveysPage() {
           isOpen
           originalTitle={duplicateSurvey.title}
           onClose={() => setDuplicateSurvey(null)}
-          onDuplicate={() => {}}
+          onDuplicate={() => { }}
         />
       )}
 
@@ -280,7 +345,7 @@ export default function SurveysPage() {
           isOpen
           itemName={deleteSurvey.title}
           onClose={() => setDeleteSurvey(null)}
-          onConfirm={() => {}}
+          onConfirm={() => { }}
         />
       )}
 
@@ -289,7 +354,7 @@ export default function SurveysPage() {
           isOpen
           surveyTitle={archiveSurvey.title}
           onClose={() => setArchiveSurvey(null)}
-          onConfirm={() => {}}
+          onConfirm={() => { }}
         />
       )}
 
@@ -297,7 +362,7 @@ export default function SurveysPage() {
         isOpen={isMoveOpen}
         itemCount={selectedIds.length || 1}
         onClose={() => setIsMoveOpen(false)}
-        onMove={() => {}}
+        onMove={() => { }}
       />
     </div>
   )
