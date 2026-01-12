@@ -103,8 +103,7 @@ export default function SurveysPage() {
       lastModified: s.lastModifiedDate
         ? new Date(s.lastModifiedDate).toLocaleDateString()
         : "Unknown",
-      thumbnail:
-        "https://resource.supersurvey.live/api/v1/files/background/smooth?type=BGLOGIN",
+      thumbnail: s.thumbnail || "https://resource.supersurvey.live/api/v1/files/background/smooth?type=BGLOGIN",
     }))
   }, [data])
 

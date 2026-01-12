@@ -65,17 +65,17 @@ export function SurveyList({
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {surveys.map((survey) => (
-            <tr key={survey.id} className="hover:bg-gray-50 transition-colors">
+            <tr key={survey.uuid} className="hover:bg-gray-50 transition-colors">
               <td className="px-6 py-4 whitespace-nowrap">
                 <Checkbox
-                  checked={selectedIds.includes(survey.id)}
-                  onCheckedChange={(checked) => onSelect(survey.id, checked as boolean)}
+                  checked={selectedIds.includes(survey.uuid)}
+                  onCheckedChange={(checked) => onSelect(survey.uuid, checked as boolean)}
                 />
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex flex-col">
                   <Link
-                    href={`/surveys/${survey.id}/edit`}
+                    href={`/surveys/${survey.uuid}/edit`}
                     className="text-sm font-medium text-gray-900 hover:text-[#00a368]"
                   >
                     {survey.title}
@@ -99,7 +99,7 @@ export function SurveyList({
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{survey.lastModified}</td>
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <div className="flex items-center justify-end space-x-2">
-                  <Link href={`/surveys/${survey.id}/edit`}>
+                  <Link href={`/surveys/${survey.uuid}/edit`}>
                     <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                       <Edit className="h-4 w-4 text-gray-500" />
                     </Button>
