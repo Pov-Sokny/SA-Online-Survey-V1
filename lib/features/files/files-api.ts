@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 import type { BackgroundFile } from "@/lib/types/file-type"
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://sa-api.supersurvey.live/api/v1"
+const API_BASE_URL = "https://resource.supersurvey.live/api/v1"
 
 // export interface BackgroundFile {
 //   id: string
@@ -14,7 +14,7 @@ const baseQuery = fetchBaseQuery({
   baseUrl: API_BASE_URL,
   credentials: "include",
   prepareHeaders: (headers) => {
-    headers.set("ngrok-skip-browser-warning", "true")
+    // headers.set("ngrok-skip-browser-warning", "true")
     headers.set("Content-Type", "application/json")
     return headers
   },
