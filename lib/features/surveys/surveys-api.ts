@@ -77,7 +77,7 @@ export const surveyApi = createApi({
         orderBy = "ASC",
         title_like,
         pageSize = 10,
-        pageNumber = 1,
+        pageNumber = 0,
       } = {}) => ({
         url: "/surveys/my-survey",
         method: "POST", 

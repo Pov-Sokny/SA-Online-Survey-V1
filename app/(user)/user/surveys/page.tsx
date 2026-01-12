@@ -68,11 +68,11 @@ export default function SurveysPage() {
   const [archiveSurvey, setArchiveSurvey] = useState<Survey | null>(null)
   const [isMoveOpen, setIsMoveOpen] = useState(false)
   const debouncedSearch = useDebounce(searchQuery, 1000)
-  const [pageNumber, setPageNumber] = useState(1)
+  const [pageNumber, setPageNumber] = useState(0)
   const pageSize = 8
 
   useEffect(() => {
-    setPageNumber(1)
+    setPageNumber(0)
   }, [debouncedSearch, sortBy, orderBy])
 
 
@@ -141,7 +141,7 @@ export default function SurveysPage() {
                   Import
                 </Button>
               </Link>
-              <Link href="/surveys/new">
+              <Link href="/user/surveys/new">
                 <Button>
                   <Plus className="h-4 w-4 mr-2" />
                   Create Survey
