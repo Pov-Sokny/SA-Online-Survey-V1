@@ -92,7 +92,7 @@ export function SurveyCard({
 
         {/* Hover Actions */}
         <div className="absolute inset-0 z-10 flex items-center justify-center gap-2 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
-          <Link href={`/surveys/${survey.uuid}/edit`}>
+          <Link href={`/user/surveys/${survey.uuid}/edit`}>
             <Button size="sm" variant="secondary" className="bg-white/90 hover:bg-white">
               Edit
             </Button>
