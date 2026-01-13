@@ -89,23 +89,27 @@ export default function SurveysPage() {
 
   /* ---------- Normalize API Data ---------- */
   const surveys: Survey[] = useMemo(() => {
-    return (data?.content ?? []).map((s: any) => ({
-      uuid: s.uuid,
-      title: s.title,
-      description: s.description,
-      status:
-        s.isClosed === "true"
-          ? "closed"
-          : s.isPublic === "true"
-            ? "active"
-            : "draft",
-      responses: s.totalResponse ?? 0,
-      lastModified: s.lastModifiedDate
-        ? new Date(s.lastModifiedDate).toLocaleDateString()
-        : "Unknown",
-      thumbnail: s.thumbnail || "https://resource.supersurvey.live/api/v1/files/background/smooth?type=BGLOGIN",
-    }))
-  }, [data])
+  return (data?.content ?? []).map((s: any) => ({
+    uuid: s.uuid,
+    title: s.title,
+    description: s.description,
+
+    status: s.isClosed
+      ? "closed"
+      : s.isPublic
+      ? "active"
+      : "draft",
+
+    totalResponse: s.totalResponse ?? 0,
+
+    // ✅ PASS RAW API DATES
+    createdDate: s.createdDate,
+    lastModifiedDate: s.lastModifiedDate,
+
+    thumbnail: s.thumbnail,
+  }))
+}, [data])
+
 
   /* ---------- Selection ---------- */
   const handleSelect = (id: string, checked: boolean) => {

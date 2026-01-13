@@ -24,16 +24,47 @@ import Link from "next/link"
 import Image from "next/image"
 import { useState } from "react"
 
+/* ---------------- Types ---------------- */
+
 export interface Survey {
   uuid: string
   title: string
   description: string
-  status: "active" | "draft" | "closed"
-  responses: number
-  lastModified: string
-  thumbnail?: string
-  folderId?: string
+  status?: "active" | "draft" | "closed"
+  totalResponse: number
+  createdDate?: string
+  lastModifiedDate?: string
+  thumbnail?: string | null
 }
+
+/* ---------------- Utils ---------------- */
+
+function formatDateTime(value?: string) {
+  if (!value) return "—"
+
+  const date = new Date(value)
+  if (isNaN(date.getTime())) return "—"
+
+  const hasTime = value.includes("T")
+
+  const datePart = date.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+  })
+
+  if (!hasTime) return datePart
+
+  const timePart = date.toLocaleTimeString(undefined, {
+    hour: "2-digit",
+    minute: "2-digit",
+  })
+
+  return `${datePart} • ${timePart}`
+}
+
+
+/* ---------------- Component ---------------- */
 
 interface SurveyCardProps {
   survey: Survey
@@ -50,24 +81,23 @@ export function SurveyCard({
   onArchive,
   onMove,
 }: SurveyCardProps) {
+  const [imgLoaded, setImgLoaded] = useState(false)
+
+  const thumbnailSrc =
+    survey.thumbnail && survey.thumbnail.trim() !== ""
+      ? survey.thumbnail
+      : "https://resource.supersurvey.live/api/v1/files/background/smooth?type=BGSURVEY"
+
   const statusColors = {
     active: "bg-green-100 text-green-800",
     draft: "bg-gray-100 text-gray-800",
     closed: "bg-red-100 text-red-800",
   }
 
-  const [imgLoaded, setImgLoaded] = useState(false)
-
-  const thumbnailSrc =
-    survey.thumbnail && survey.thumbnail.trim() !== ""
-      ? survey.thumbnail
-      : "https://resource.supersurvey.live/api/v1/files/background/smooth?type=BGSURVEY";
-
   return (
-    <Card className="group hover:shadow-md transition-shadow duration-200 flex flex-col h-full overflow-hidden">
-      {/* Thumbnail Area */}
-      <div className="relative h-32 w-full overflow-hidden border-b bg-gray-100">
-        {/* Skeleton / Blur placeholder */}
+    <Card className="group flex flex-col overflow-hidden transition-shadow hover:shadow-md">
+      {/* ---------- Thumbnail ---------- */}
+      <div className="relative h-32 w-full bg-gray-100 border-b overflow-hidden">
         {!imgLoaded && (
           <div className="absolute inset-0 animate-pulse bg-gray-200" />
         )}
@@ -77,49 +107,48 @@ export function SurveyCard({
           alt="Survey thumbnail"
           fill
           unoptimized
-          priority
-          className={`object-cover transition-opacity duration-500 ${imgLoaded ? "opacity-100" : "opacity-0"
-            }`}
+          className={`object-cover transition-opacity duration-500 ${
+            imgLoaded ? "opacity-100" : "opacity-0"
+          }`}
           onLoadingComplete={() => setImgLoaded(true)}
         />
 
-        {/* Status Badge */}
-        <div className="absolute top-2 right-2 z-10">
-          <Badge className={statusColors[survey.status]}>
-            {survey.status.charAt(0).toUpperCase() + survey.status.slice(1)}
-          </Badge>
-        </div>
+        {survey.status && (
+          <div className="absolute top-2 right-2 z-10">
+            <Badge className={statusColors[survey.status]}>
+              {survey.status.toUpperCase()}
+            </Badge>
+          </div>
+        )}
 
         {/* Hover Actions */}
         <div className="absolute inset-0 z-10 flex items-center justify-center gap-2 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
           <Link href={`/user/surveys/${survey.uuid}/edit`}>
-            <Button size="sm" variant="secondary" className="bg-white/90 hover:bg-white">
+            <Button size="sm" variant="secondary">
               Edit
             </Button>
           </Link>
-
           <Link href={`/surveys/${survey.uuid}/preview`}>
-            <Button size="sm" variant="secondary" className="bg-white/90 hover:bg-white">
+            <Button size="sm" variant="secondary">
               Preview
             </Button>
           </Link>
         </div>
       </div>
 
-      {/* Content Area */}
-      <div className="p-4 flex-1 flex flex-col">
+      {/* ---------- Content ---------- */}
+      <div className="p-4 flex flex-col flex-1">
         <div className="flex justify-between items-start mb-2">
           <Link
-            href={`/surveys/${survey.uuid}/edit`}
-            className="hover:text-[#00a368] transition-colors"
+            href={`/user/surveys/${survey.uuid}/edit`}
+            className="hover:text-[#00a368]"
           >
-            <h3 className="font-semibold text-gray-900 line-clamp-1" title={survey.title}>
-              {survey.title}
-            </h3>
+            <h3 className="font-semibold line-clamp-1">{survey.title}</h3>
           </Link>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100">
+              <button className="p-1 rounded-full hover:bg-gray-100 text-gray-400">
                 <MoreHorizontal className="h-4 w-4" />
               </button>
             </DropdownMenuTrigger>
@@ -142,7 +171,10 @@ export function SurveyCard({
               <DropdownMenuItem onClick={() => onArchive(survey)}>
                 <Archive className="h-4 w-4 mr-2" /> Archive
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onDelete(survey)} className="text-red-600">
+              <DropdownMenuItem
+                onClick={() => onDelete(survey)}
+                className="text-red-600"
+              >
                 <Trash2 className="h-4 w-4 mr-2" /> Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -153,14 +185,15 @@ export function SurveyCard({
           {survey.description || "No description provided."}
         </p>
 
-        <div className="flex items-center justify-between text-xs text-gray-400 pt-3 border-t">
-          <div className="flex items-center" title="Responses">
+        {/* ---------- Footer ---------- */}
+        <div className="flex justify-between items-center text-xs text-gray-400 border-t pt-3">
+          <div className="flex items-center">
             <MessageSquare className="h-3.5 w-3.5 mr-1" />
-            {survey.responses}
+            {survey.totalResponse}
           </div>
-          <div className="flex items-center" title="Last Modified">
+          <div className="flex items-center">
             <Clock className="h-3.5 w-3.5 mr-1" />
-            {survey.lastModified}
+            {formatDateTime(survey.lastModifiedDate ?? survey.createdDate)}
           </div>
         </div>
       </div>
