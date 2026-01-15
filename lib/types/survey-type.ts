@@ -52,3 +52,22 @@ export interface CreateQuestionResponse {
   message: string
   questionIds?: string[]
 }
+
+
+export type ApiQuestionType =
+  | "MULTIPLE_CHOICE"
+  | "SINGLE_CHOICE"
+  | "SHORT_ANSWER"
+
+export interface ApiOption {
+  optionText: string
+  orderIndex: number
+}
+
+export interface ApiQuestion {
+  questionText: string
+  questionType: ApiQuestionType
+  orderIndex: number
+  isRequired: boolean
+  options: ApiOption[]
+}

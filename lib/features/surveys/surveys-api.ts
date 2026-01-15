@@ -1,6 +1,8 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 import type { BaseQueryFn, FetchArgs, FetchBaseQueryError } from "@reduxjs/toolkit/query"
-import type { SurveyRequest, SurveyResponse, SurverResponeList, Question, CreateQuestionResponse } from "@/lib/types/survey-type"
+import type { SurveyRequest, SurveyResponse, SurverResponeList, Question, CreateQuestionResponse, } from "@/lib/types/survey-type"
+import { mapQuestionsToApi } from "@/lib/types/mapQuestionsToApi"
+import type { ApiQuestion } from "@/lib/types/survey-type"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://sa-api.supersurvey.live/api/v1"
 
@@ -80,7 +82,7 @@ export const surveyApi = createApi({
         pageNumber = 0,
       } = {}) => ({
         url: "/surveys/my-survey",
-        method: "POST", 
+        method: "POST",
         params: {
           sortBy,
           orderBy,
@@ -93,17 +95,21 @@ export const surveyApi = createApi({
       providesTags: ["Survey"],
     }),
 
-    createQuestions: builder.mutation<CreateQuestionResponse, { surveyUuid: string; questions: Question[] }>({
+    createQuestions: builder.mutation<
+      CreateQuestionResponse,
+      { surveyUuid: string; questions: ApiQuestion[] }
+    >({
       query: ({ surveyUuid, questions }) => ({
-        url: `/surveys/${surveyUuid}/questions`,
-        method: "POST",
-        body: { questions },
+        url: `/surveys/${surveyUuid}/question`,
+        method: "PATCH",
+        body: questions, // 👈 MUST be array
         credentials: "include",
       }),
       invalidatesTags: ["Survey"],
     }),
 
+
   }),
 })
 
-export const { useCreateSurveyMutation, useGetSurveysQuery } = surveyApi
+export const { useCreateSurveyMutation, useGetSurveysQuery,useCreateQuestionsMutation } = surveyApi
