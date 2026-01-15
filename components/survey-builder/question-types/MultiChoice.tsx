@@ -1,7 +1,7 @@
 import React from 'react';
 import { Plus, X, GripVertical, Square } from 'lucide-react';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 interface Option {
   id: string;
   text: string;

@@ -1,6 +1,6 @@
 import React from 'react';
-import { Switch } from '@/components/ui/Switch';
-import { Select } from '@/components/ui/Select';
+import { Switch } from '@/components/ui/switch';
+import { Select } from '@/components/ui/select';
 interface TextQuestionProps {
   isLong: boolean;
   validationType: string;

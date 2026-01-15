@@ -10,7 +10,6 @@ import { MultiChoice } from "./question-types/MultiChoice"
 import { TextQuestion } from "./question-types/TextQuestion"
 import { RatingQuestion } from "./question-types/RatingQuestion"
 import { MatrixQuestion } from "./question-types/MatrixQuestion"
-import { NPSQuestion } from "./question-types/NPSQuestion"
 
 interface QuestionCardProps {
   question: any
@@ -35,7 +34,7 @@ export function QuestionCard({ question, isActive, onClick, onUpdate, onDelete, 
             }
           />
         )
-      case "multi_choice":
+      case "multiple_choice":
         return (
           <MultiChoice
             options={question.options}
@@ -52,8 +51,6 @@ export function QuestionCard({ question, isActive, onClick, onUpdate, onDelete, 
         return <RatingQuestion maxRating={question.maxRating} symbol={question.symbol} onChange={onUpdate} />
       case "matrix":
         return <MatrixQuestion rows={question.rows} columns={question.columns} onChange={onUpdate} />
-      case "nps":
-        return <NPSQuestion />
       default:
         return null
     }

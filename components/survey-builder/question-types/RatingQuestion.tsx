@@ -1,6 +1,6 @@
 import React from 'react';
 import { Star, Heart, ThumbsUp } from 'lucide-react';
-import { Select } from '@/components/ui/Select';
+import { Select } from '@/components/ui/select';
 interface RatingQuestionProps {
   maxRating: number;
   symbol: 'star' | 'number' | 'heart' | 'thumb';

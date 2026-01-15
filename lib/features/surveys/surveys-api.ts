@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 import type { BaseQueryFn, FetchArgs, FetchBaseQueryError } from "@reduxjs/toolkit/query"
-import type { SurveyRequest, SurveyResponse, SurverResponeList } from "@/lib/types/survey-type"
+import type { SurveyRequest, SurveyResponse, SurverResponeList, Question, CreateQuestionResponse } from "@/lib/types/survey-type"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://sa-api.supersurvey.live/api/v1"
 
@@ -91,6 +91,16 @@ export const surveyApi = createApi({
         credentials: "include",
       }),
       providesTags: ["Survey"],
+    }),
+
+    createQuestions: builder.mutation<CreateQuestionResponse, { surveyUuid: string; questions: Question[] }>({
+      query: ({ surveyUuid, questions }) => ({
+        url: `/surveys/${surveyUuid}/questions`,
+        method: "POST",
+        body: { questions },
+        credentials: "include",
+      }),
+      invalidatesTags: ["Survey"],
     }),
 
   }),

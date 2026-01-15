@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
-import { Select } from '../ui/Select';
-import { Input } from '../ui/Input';
-import { Button } from '../ui/Button';
+import { Select } from '../ui/select';
+import { Input } from '../ui/input';
+import { Button } from '../ui/button';
 interface Condition {
   id: string;
   questionId: string;
