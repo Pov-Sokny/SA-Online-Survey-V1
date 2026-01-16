@@ -68,7 +68,7 @@ export function QuestionCard({ question, isActive, onClick, onUpdate, onDelete, 
               {question.title || <span className="text-gray-400 italic">Untitled Question</span>}
               {question.required && <span className="text-red-500 ml-1">*</span>}
             </h3>
-            <p className="text-sm text-gray-500 mt-1 capitalize">{question.type.replace("_", " ")}</p>
+            {/* <p className="text-sm text-gray-500 mt-1 capitalize">/{question.type.replace("_", " ")}</p> */}
           </div>
         </div>
       </Card>

@@ -108,8 +108,12 @@ export const surveyApi = createApi({
       invalidatesTags: ["Survey"],
     }),
 
+    getQuestionsBySurveyUuid: builder.query<Question[], string>({
+  query: (uuid) => `/surveys/${uuid}/question`,
+})
+
 
   }),
 })
 
-export const { useCreateSurveyMutation, useGetSurveysQuery,useCreateQuestionsMutation } = surveyApi
+export const { useCreateSurveyMutation, useGetSurveysQuery,useCreateQuestionsMutation, useGetQuestionsBySurveyUuidQuery } = surveyApi

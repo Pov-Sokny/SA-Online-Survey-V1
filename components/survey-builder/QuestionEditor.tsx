@@ -4,14 +4,15 @@ import { useState } from "react"
 import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { QuestionCard } from "@/components/survey-builder/QuestionCard"
+import type { QuestionRequest } from "@/lib/types/survey-type"
 
 interface QuestionEditorProps {
-  questions: any[]
+  questions: QuestionRequest
   setQuestions: (questions: any[]) => void
 }
 
 export function QuestionEditor({ questions, setQuestions }: QuestionEditorProps) {
-  const [activeQuestionId, setActiveQuestionId] = useState<string | null>(questions[0]?.id || null)
+  const [activeQuestionId, setActiveQuestionId] = useState<string | null>(questions[0]?.uuid || null)
 
   const addQuestion = () => {
     const newQuestion = {
