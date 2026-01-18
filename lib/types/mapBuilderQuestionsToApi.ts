@@ -9,7 +9,7 @@ export function mapBuilderQuestionsToApi(questions: BuilderQuestion[]) {
     options:
       q.type === "single_choice" || q.type === "multiple_choice"
         ? q.options?.map((o, i) => ({
-            optionText: o.optionText,
+            optionText: o.text || o.optionText,
             orderIndex: i + 1,
           })) ?? []
         : [],
@@ -21,7 +21,7 @@ function mapType(type: BuilderQuestion["type"]): ApiQuestionType {
     case "multiple_choice":
       return "MULTIPLE_CHOICE"
     case "single_choice":
-      return "SINGE_CHOICE"
+      return "SINGLE_CHOICE"
     default:
       return "SHORT_ANSWER"
   }

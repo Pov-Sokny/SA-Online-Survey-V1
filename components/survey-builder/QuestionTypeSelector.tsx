@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { CheckCircle2, CheckSquare, AlignLeft, Star, BarChartHorizontal, BoxIcon } from 'lucide-react';
 interface QuestionTypeSelectorProps {
@@ -9,7 +11,7 @@ const types = [{
   label: 'Single Choice',
   icon: CheckCircle2
 }, {
-  id: 'multi_choice',
+  id: 'multiple_choice',
   label: 'Multiple Choice',
   icon: CheckSquare
 }, {

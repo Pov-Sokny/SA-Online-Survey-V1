@@ -64,11 +64,16 @@ export function QuestionCard({ question, isActive, onClick, onUpdate, onDelete, 
             <GripVertical className="h-5 w-5" />
           </div>
           <div className="flex-1">
-            <h3 className="font-medium text-gray-900">
-              {question.title || <span className="text-gray-400 italic">Untitled Question</span>}
-              {question.required && <span className="text-red-500 ml-1">*</span>}
-            </h3>
-            {/* <p className="text-sm text-gray-500 mt-1 capitalize">/{question.type.replace("_", " ")}</p> */}
+            <div className="flex items-center gap-2">
+              <h3 className="font-medium text-gray-900">
+                {question.title || <span className="text-gray-400 italic">Untitled Question</span>}
+              </h3>
+              {question.required && <span className="text-red-500">*</span>}
+            </div>
+            {question.description && (
+              <p className="text-sm text-gray-500 mt-1">{question.description}</p>
+            )}
+            <p className="text-xs text-gray-400 mt-2 capitalize">{question.type.replace("_", " ")}</p>
           </div>
         </div>
       </Card>

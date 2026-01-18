@@ -1,30 +1,36 @@
 "use client"
 
+"use client"
+
 import { useState } from "react"
 import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { QuestionCard } from "@/components/survey-builder/QuestionCard"
-import type { QuestionRequest } from "@/lib/types/survey-type"
+import type { BuilderQuestion } from "@/lib/types/survey-type"
 
 interface QuestionEditorProps {
-  questions: QuestionRequest
-  setQuestions: (questions: any[]) => void
+  questions: BuilderQuestion[]
+  setQuestions: (questions: BuilderQuestion[]) => void
 }
 
 export function QuestionEditor({ questions, setQuestions }: QuestionEditorProps) {
-  const [activeQuestionId, setActiveQuestionId] = useState<string | null>(questions[0]?.uuid || null)
+  const [activeQuestionId, setActiveQuestionId] = useState<string | null>(
+    questions && questions.length > 0 ? questions[0]?.uuid : null
+  )
 
   const addQuestion = () => {
-    const newQuestion = {
-      id: crypto.randomUUID(),
-      type: "single_choice",
+    const tempUuid = `temp_${Date.now()}`
+    const newQuestion: BuilderQuestion = {
+      uuid: tempUuid,
+      type: "single_choice" as const,
       title: "",
       description: "",
       required: false,
       options: [
         {
-          id: "1",
+          uuid: `temp_option_${Date.now()}`,
           text: "Option 1",
+          orderIndex: 0,
         },
       ],
       rows: ["Row 1"],
@@ -33,15 +39,16 @@ export function QuestionEditor({ questions, setQuestions }: QuestionEditorProps)
       symbol: "star",
       isLong: false,
       validationType: "none",
+      orderIndex: (questions?.length || 0),
     }
-    setQuestions([...questions, newQuestion])
-    setActiveQuestionId(newQuestion.id)
+    setQuestions([...(questions || []), newQuestion])
+    setActiveQuestionId(tempUuid)
   }
 
-  const updateQuestion = (id: string, updates: any) => {
+  const updateQuestion = (uuid: string, updates: any) => {
     setQuestions(
-      questions.map((q) =>
-        q.id === id
+      (questions || []).map((q) =>
+        q.uuid === uuid
           ? {
               ...q,
               ...updates,
@@ -51,37 +58,38 @@ export function QuestionEditor({ questions, setQuestions }: QuestionEditorProps)
     )
   }
 
-  const deleteQuestion = (id: string) => {
-    setQuestions(questions.filter((q) => q.id !== id))
-    if (activeQuestionId === id) {
+  const deleteQuestion = (uuid: string) => {
+    setQuestions((questions || []).filter((q) => q.uuid !== uuid))
+    if (activeQuestionId === uuid) {
       setActiveQuestionId(null)
     }
   }
 
   const duplicateQuestion = (question: any) => {
+    const newUuid = crypto.randomUUID()
     const newQuestion = {
       ...question,
-      id: crypto.randomUUID(),
+      uuid: newUuid,
       title: `${question.title} (Copy)`,
     }
-    const index = questions.findIndex((q) => q.id === question.id)
-    const newQuestions = [...questions]
+    const index = (questions || []).findIndex((q) => q.uuid === question.uuid)
+    const newQuestions = [...(questions || [])]
     newQuestions.splice(index + 1, 0, newQuestion)
     setQuestions(newQuestions)
-    setActiveQuestionId(newQuestion.id)
+    setActiveQuestionId(newUuid)
   }
 
   return (
     <div className="max-w-3xl mx-auto pb-20">
       <div className="space-y-4">
-        {questions.map((question) => (
+        {(questions || []).map((question) => (
           <QuestionCard
-            key={question.id}
+            key={question.uuid}
             question={question}
-            isActive={activeQuestionId === question.id}
-            onClick={() => setActiveQuestionId(question.id)}
-            onUpdate={(updates) => updateQuestion(question.id, updates)}
-            onDelete={() => deleteQuestion(question.id)}
+            isActive={activeQuestionId === question.uuid}
+            onClick={() => setActiveQuestionId(question.uuid)}
+            onUpdate={(updates) => updateQuestion(question.uuid, updates)}
+            onDelete={() => deleteQuestion(question.uuid)}
             onDuplicate={() => duplicateQuestion(question)}
           />
         ))}

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Save } from "lucide-react"
+import { ArrowLeft, Save, Plus } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -18,12 +18,13 @@ import {
   useGetQuestionsBySurveyUuidQuery,
 } from "@/lib/features/surveys/surveys-api"
 
-import { mapApiQuestionsToBuilder } from "@/lib/types/mapQuestionsToApi"
+import { mapApiQuestionsToBuilder } from "@/lib/types/mapApiQuestionToBuilder"
 import { mapBuilderQuestionsToApi } from "@/lib/types/mapBuilderQuestionsToApi"
 import type { BuilderQuestion } from "@/lib/types/survey-type"
 
 export default function SurveyEditorPage() {
   const { uuid: surveyUuid } = useParams<{ uuid: string }>()
+  const [activeTab, setActiveTab] = useState("questions")
 
   const [questions, setQuestions] = useState<BuilderQuestion[]>([])
 
@@ -41,9 +42,9 @@ export default function SurveyEditorPage() {
     }
   }, [data])
 
-  if (!surveyUuid) return <div>Loading survey...</div>
-  if (isLoading) return <div>Loading questions...</div>
-  if (isError) return <div className="text-red-500">Failed to load</div>
+  if (!surveyUuid) return <div className="flex items-center justify-center min-h-screen">Loading survey...</div>
+  if (isLoading) return <div className="flex items-center justify-center min-h-screen">Loading questions...</div>
+  if (isError) return <div className="flex items-center justify-center min-h-screen text-red-500">Failed to load questions</div>
 
   const handleSave = async () => {
     try {
@@ -54,57 +55,115 @@ export default function SurveyEditorPage() {
         questions: payload,
       }).unwrap()
 
-      alert("Saved ✅")
+      alert("Survey saved successfully ✅")
     } catch (e) {
       console.error(e)
-      alert("Save failed ❌")
+      alert("Failed to save survey ❌")
     }
+  }
+
+  const handleAddQuestion = () => {
+    const newUuid = crypto.randomUUID()
+    const optionUuid = crypto.randomUUID()
+    const newQuestion = {
+      uuid: newUuid,
+      type: "single_choice" as const,
+      title: "",
+      description: "",
+      required: false,
+      options: [
+        {
+          uuid: optionUuid,
+          text: "Option 1",
+          orderIndex: 0,
+        },
+      ],
+      rows: ["Row 1"],
+      columns: ["Col 1"],
+      maxRating: 5,
+      symbol: "star",
+      isLong: false,
+      validationType: "none",
+      orderIndex: (questions?.length || 0),
+    }
+    setQuestions([...(questions || []), newQuestion])
   }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <header className="bg-white border-b">
+      <header className="bg-white border-b sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="/user/surveys">
-              <ArrowLeft className="h-5 w-5" />
+            <Link href="/user/surveys" className="hover:bg-gray-100 p-1 rounded">
+              <ArrowLeft className="h-5 w-5 text-gray-600" />
             </Link>
-            <h1 className="text-lg font-semibold flex items-center gap-2">
-              Edit Survey  
+            <h1 className="text-lg font-semibold flex items-center gap-2 text-gray-900">
+              Edit Survey
               <Badge variant="outline">Draft</Badge>
             </h1>
           </div>
 
-          <Button onClick={handleSave} disabled={isSaving}>
-            <Save className="h-4 w-4 mr-2" />
-            {isSaving ? "Saving..." : "Save"}
-          </Button>
+          <div className="flex items-center gap-3">
+            {activeTab === "questions" && (
+              <Button onClick={handleAddQuestion} variant="outline" className="gap-2 bg-transparent">
+                <Plus className="h-4 w-4" />
+                Add Question
+              </Button>
+            )}
+            <Button 
+              onClick={handleSave} 
+              disabled={isSaving}
+              className="bg-[#00a368] hover:bg-[#008f5b] text-white gap-2"
+            >
+              <Save className="h-4 w-4" />
+              {isSaving ? "Saving..." : "Save"}
+            </Button>
+          </div>
         </div>
       </header>
 
       <main className="flex-1">
-        <Tabs defaultValue="questions">
-          <TabsList>
-            <TabsTrigger value="questions">Questions</TabsTrigger>
-            <TabsTrigger value="responses">Responses</TabsTrigger>
-            <TabsTrigger value="settings">Settings</TabsTrigger>
-          </TabsList>
+        <div className="max-w-7xl mx-auto">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <div className="bg-white border-b sticky top-16 z-30">
+              <TabsList className="justify-start rounded-none bg-transparent p-0 h-auto border-b-0">
+                <TabsTrigger 
+                  value="questions"
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#00a368] data-[state=active]:text-[#00a368]"
+                >
+                  Questions
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="responses"
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#00a368] data-[state=active]:text-[#00a368]"
+                >
+                  Responses
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="settings"
+                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#00a368] data-[state=active]:text-[#00a368]"
+                >
+                  Settings
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
-          <TabsContent value="questions">
-            <QuestionEditor
-              questions={questions}
-              setQuestions={setQuestions}
-            />
-          </TabsContent>
+            <TabsContent value="questions" className="mt-0 p-6">
+              <QuestionEditor
+                questions={questions}
+                setQuestions={setQuestions}
+              />
+            </TabsContent>
 
-          <TabsContent value="responses">
-            <ResponsesTab />
-          </TabsContent>
+            <TabsContent value="responses" className="mt-0 p-6">
+              <ResponsesTab />
+            </TabsContent>
 
-          <TabsContent value="settings">
-            <SettingsTab />
-          </TabsContent>
-        </Tabs>
+            <TabsContent value="settings" className="mt-0 p-6">
+              <SettingsTab />
+            </TabsContent>
+          </Tabs>
+        </div>
       </main>
     </div>
   )
