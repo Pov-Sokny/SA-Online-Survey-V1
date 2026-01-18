@@ -77,7 +77,7 @@ export const authApi = createApi({
     }),
     getCurrentUser: builder.query<User, void>({
       query: () => ({
-        url: "/auth/me",
+        url: "/users/me",
         credentials: "include",
       }),
       providesTags: ["User"],
