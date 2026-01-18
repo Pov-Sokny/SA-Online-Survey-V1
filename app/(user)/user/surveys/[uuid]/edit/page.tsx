@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Save, Plus } from "lucide-react"
+import { ArrowLeft, Save, Eye, Share2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -23,15 +23,19 @@ import { mapBuilderQuestionsToApi } from "@/lib/types/mapBuilderQuestionsToApi"
 import type { BuilderQuestion } from "@/lib/types/survey-type"
 
 export default function SurveyEditorPage() {
-  const { uuid: surveyUuid } = useParams<{ uuid: string }>()
-  const [activeTab, setActiveTab] = useState("questions")
+  const { uuid } = useParams<{ uuid: string }>()
+  const surveyUuid = uuid
 
+  const [activeTab, setActiveTab] = useState("questions")
   const [questions, setQuestions] = useState<BuilderQuestion[]>([])
 
-  const { data, isLoading, isError } =
-    useGetQuestionsBySurveyUuidQuery(surveyUuid, {
-      skip: !surveyUuid,
-    })
+  const {
+    data,
+    isLoading,
+    isError,
+  } = useGetQuestionsBySurveyUuidQuery(surveyUuid, {
+    skip: !surveyUuid,
+  })
 
   const [createQuestions, { isLoading: isSaving }] =
     useCreateQuestionsMutation()
@@ -42,9 +46,29 @@ export default function SurveyEditorPage() {
     }
   }, [data])
 
-  if (!surveyUuid) return <div className="flex items-center justify-center min-h-screen">Loading survey...</div>
-  if (isLoading) return <div className="flex items-center justify-center min-h-screen">Loading questions...</div>
-  if (isError) return <div className="flex items-center justify-center min-h-screen text-red-500">Failed to load questions</div>
+  if (!surveyUuid) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        Loading survey...
+      </div>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        Loading questions...
+      </div>
+    )
+  }
+
+  if (isError) {
+    return (
+      <div className="flex items-center justify-center min-h-screen text-red-500">
+        Failed to load questions
+      </div>
+    )
+  }
 
   const handleSave = async () => {
     try {
@@ -56,37 +80,10 @@ export default function SurveyEditorPage() {
       }).unwrap()
 
       alert("Survey saved successfully ✅")
-    } catch (e) {
-      console.error(e)
+    } catch (error) {
+      console.error(error)
       alert("Failed to save survey ❌")
     }
-  }
-
-  const handleAddQuestion = () => {
-    const newUuid = crypto.randomUUID()
-    const optionUuid = crypto.randomUUID()
-    const newQuestion = {
-      uuid: newUuid,
-      type: "single_choice" as const,
-      title: "",
-      description: "",
-      required: false,
-      options: [
-        {
-          uuid: optionUuid,
-          text: "Option 1",
-          orderIndex: 0,
-        },
-      ],
-      rows: ["Row 1"],
-      columns: ["Col 1"],
-      maxRating: 5,
-      symbol: "star",
-      isLong: false,
-      validationType: "none",
-      orderIndex: (questions?.length || 0),
-    }
-    setQuestions([...(questions || []), newQuestion])
   }
 
   return (
@@ -94,9 +91,13 @@ export default function SurveyEditorPage() {
       <header className="bg-white border-b sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="/user/surveys" className="hover:bg-gray-100 p-1 rounded">
+            <Link
+              href="/user/surveys"
+              className="hover:bg-gray-100 p-1 rounded"
+            >
               <ArrowLeft className="h-5 w-5 text-gray-600" />
             </Link>
+
             <h1 className="text-lg font-semibold flex items-center gap-2 text-gray-900">
               Edit Survey
               <Badge variant="outline">Draft</Badge>
@@ -104,14 +105,25 @@ export default function SurveyEditorPage() {
           </div>
 
           <div className="flex items-center gap-3">
-            {activeTab === "questions" && (
-              <Button onClick={handleAddQuestion} variant="outline" className="gap-2 bg-transparent">
-                <Plus className="h-4 w-4" />
-                Add Question
+            {/* Preview */}
+            <Link href={`/user/surveys/${surveyUuid}/preview`}>
+              <Button variant="ghost" size="sm">
+                <Eye className="h-4 w-4 mr-2" />
+                Preview
               </Button>
-            )}
-            <Button 
-              onClick={handleSave} 
+            </Link>
+
+            {/* Share */}
+            <Link href={`/user/surveys/${surveyUuid}/share`}>
+              <Button variant="ghost" size="sm">
+                <Share2 className="h-4 w-4 mr-2" />
+                Share
+              </Button>
+            </Link>
+
+            {/* Save */}
+            <Button
+              onClick={handleSave}
               disabled={isSaving}
               className="bg-[#00a368] hover:bg-[#008f5b] text-white gap-2"
             >
@@ -124,25 +136,16 @@ export default function SurveyEditorPage() {
 
       <main className="flex-1">
         <div className="max-w-7xl mx-auto">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
             <div className="bg-white border-b sticky top-16 z-30">
-              <TabsList className="justify-start rounded-none bg-transparent p-0 h-auto border-b-0">
-                <TabsTrigger 
-                  value="questions"
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#00a368] data-[state=active]:text-[#00a368]"
-                >
+              <TabsList className="justify-start rounded-none bg-transparent p-0 h-auto">
+                <TabsTrigger value="questions">
                   Questions
                 </TabsTrigger>
-                <TabsTrigger 
-                  value="responses"
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#00a368] data-[state=active]:text-[#00a368]"
-                >
+                <TabsTrigger value="responses">
                   Responses
                 </TabsTrigger>
-                <TabsTrigger 
-                  value="settings"
-                  className="rounded-none border-b-2 border-transparent data-[state=active]:border-[#00a368] data-[state=active]:text-[#00a368]"
-                >
+                <TabsTrigger value="settings">
                   Settings
                 </TabsTrigger>
               </TabsList>
