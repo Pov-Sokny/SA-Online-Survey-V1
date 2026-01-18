@@ -4,11 +4,11 @@ import type { NextRequest } from "next/server"
 export function proxy(request: NextRequest) {
   const token = request.cookies.get("auth_token")?.value
   const isAuthPage = request.nextUrl.pathname.startsWith("/login")
-  const isProtectedPage = request.nextUrl.pathname.startsWith("/dashboard")
+  const isProtectedPage = request.nextUrl.pathname.startsWith("/user")
 
   // Redirect authenticated users away from login page
   if (isAuthPage && token) {
-    return NextResponse.redirect(new URL("/dashboard", request.url))
+    return NextResponse.redirect(new URL("/user", request.url))
   }
   
 

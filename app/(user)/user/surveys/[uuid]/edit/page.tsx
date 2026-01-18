@@ -66,11 +66,11 @@ export default function SurveyEditorPage() {
       <header className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Link href="/surveys">
+            <Link href="/user/surveys">
               <ArrowLeft className="h-5 w-5" />
             </Link>
             <h1 className="text-lg font-semibold flex items-center gap-2">
-              Edit Survey
+              Edit Survey  
               <Badge variant="outline">Draft</Badge>
             </h1>
           </div>

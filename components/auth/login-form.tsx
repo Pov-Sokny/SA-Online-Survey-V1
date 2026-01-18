@@ -16,6 +16,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2 } from "lucide-react"
 import Image from "next/image"
 import { toast } from "sonner"
+import { Separator } from "@/components/ui/separator"
 
 // import NextImage from "next/image";
 // import {Image} from "@heroui/react";
@@ -28,6 +29,15 @@ export function LoginForm() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
+
+  const GOOGLE_LOGIN_URL =
+    process.env.NEXT_PUBLIC_GOOGLE_LOGIN_URL ??
+    "http://localhost:8080/oauth2/authorization/google?prompt=select_account"
+
+  const handleGoogleLogin = () => {
+    window.location.href = GOOGLE_LOGIN_URL
+  }
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -45,8 +55,8 @@ export function LoginForm() {
       await new Promise((resolve) => setTimeout(resolve, 300))
 
       toast.success("Login successful 🎉", {
-      description: "Welcome back! bro/sis",
-     })
+        description: "Welcome back! bro/sis",
+      })
 
 
 
@@ -69,7 +79,7 @@ export function LoginForm() {
       } catch (fetchError: any) {
         if (fetchError?.status === 401) {
           setError(
-            "Authentication failed. Check backend Set-Cookie header includes: Path=/; HttpOnly; SameSite=None; Secure (for ngrok)",
+            "Authentication failed. Please login again.",
           )
         } else {
           setError("Failed to load user profile. Please try again.")
@@ -242,6 +252,34 @@ export function LoginForm() {
                     )}
                   </Button>
                 </form>
+
+                {/* Start Login with google */}
+                <Separator className="my-4 bg-white/20" />
+                
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleGoogleLogin}
+                  disabled={isLoading}
+                  className="
+                    w-full rounded-xl
+                    flex items-center justify-center gap-2
+                    border-white/30
+                    bg-primary/10
+                    text-gray-200
+                    hover:bg-primary hover:border-primay hover:text-white"
+                >
+                  <Image
+                    src="https://www.svgrepo.com/show/475656/google-color.svg"
+                    alt="Google"
+                    width={18}
+                    height={18}
+                  />
+                  Login with Google
+                </Button>
+                {/* End Login with google */}
+
               </CardContent>
 
               <CardFooter className="justify-center">
