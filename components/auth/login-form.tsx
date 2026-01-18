@@ -32,7 +32,7 @@ export function LoginForm() {
 
   const GOOGLE_LOGIN_URL =
     process.env.NEXT_PUBLIC_GOOGLE_LOGIN_URL ??
-    "http://localhost:8080/oauth2/authorization/google?prompt=select_account"
+    "https://sa-api.supersurvey.live/oauth2/authorization/google?prompt=select_account"
 
   const handleGoogleLogin = () => {
     window.location.href = GOOGLE_LOGIN_URL
