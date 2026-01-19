@@ -1,61 +1,69 @@
-import React, { useState } from 'react';
-import { Button } from '../ui/button';
-import { Select } from '../ui/select';
-import { Copy, Check } from 'lucide-react';
+"use client"
+
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+import { Copy, Check } from "lucide-react"
+
 interface EmbedCodeProps {
-  surveyId: string;
+  surveyId: string
 }
-export function EmbedCode({
-  surveyId
-}: EmbedCodeProps) {
-  const [copied, setCopied] = useState(false);
-  const [type, setType] = useState('inline');
-  const embedCode = `<iframe 
-  src="https://supersurvey.com/s/${surveyId}?embed=${type}" 
-  width="100%" 
-  height="600px" 
-  frameborder="0" 
-  marginheight="0" 
-  marginwidth="0">
-  Loading...
-</iframe>`;
+
+export function EmbedCode({ surveyId }: EmbedCodeProps) {
+  const [copied, setCopied] = useState(false)
+
+  const embedCode = `<iframe src="https://supersurvey.live/s/${surveyId}" width="100%" height="800" frameborder="0" style="border: none; border-radius: 8px;"></iframe>`
+
   const handleCopy = () => {
-    navigator.clipboard.writeText(embedCode);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-  return <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <div className="w-48">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Embed Type
-          </label>
-          <Select options={[{
-          label: 'Inline Iframe',
-          value: 'inline'
-        }, {
-          label: 'Popup Button',
-          value: 'popup'
-        }, {
-          label: 'Side Tab',
-          value: 'tab'
-        }]} onChange={e => setType(e.target.value)} />
-        </div>
+    navigator.clipboard.writeText(embedCode)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <div className="space-y-6">
+      <p className="text-sm text-gray-500">
+        Copy this code and paste it into your website's HTML to embed the survey.
+      </p>
+
+      <div className="space-y-3">
+        <label className="block text-sm font-medium text-gray-900">
+          Embed Code
+        </label>
+        <Card className="p-4 bg-gray-50 border border-gray-200">
+          <pre className="text-xs text-gray-600 overflow-x-auto font-mono">
+            {embedCode}
+          </pre>
+        </Card>
       </div>
 
-      <div className="relative">
-        <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto text-sm font-mono">
-          {embedCode}
-        </pre>
-        <Button size="sm" className="absolute top-2 right-2 bg-white/10 hover:bg-white/20 text-white border-0" onClick={handleCopy}>
-          {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-          {copied ? 'Copied' : 'Copy'}
-        </Button>
-      </div>
+      <Button
+        onClick={handleCopy}
+        className="bg-[#00a368] hover:bg-[#008f5b] text-white gap-2"
+      >
+        {copied ? (
+          <>
+            <Check className="h-4 w-4" />
+            Copied to Clipboard
+          </>
+        ) : (
+          <>
+            <Copy className="h-4 w-4" />
+            Copy Embed Code
+          </>
+        )}
+      </Button>
 
-      <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 text-sm text-blue-800">
-        <strong>Tip:</strong> Paste this code into your website's HTML where you
-        want the survey to appear.
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <h4 className="text-sm font-medium text-blue-900 mb-2">
+          Customization Options
+        </h4>
+        <ul className="text-sm text-blue-800 space-y-1">
+          <li>• Adjust width and height attributes to fit your layout</li>
+          <li>• Remove border-radius for a squared appearance</li>
+          <li>• Add border styling with border-color and border-width</li>
+        </ul>
       </div>
-    </div>;
+    </div>
+  )
 }

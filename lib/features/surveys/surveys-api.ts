@@ -16,6 +16,11 @@ const baseQuery = fetchBaseQuery({
   },
 })
 
+interface ShareResponse {
+  link: string
+  qrCodeUrl: string
+}
+
 const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (
   args,
   api,
@@ -109,11 +114,19 @@ export const surveyApi = createApi({
     }),
 
     getQuestionsBySurveyUuid: builder.query<Question[], string>({
-  query: (uuid) => `/surveys/${uuid}/question`,
-})
+      query: (uuid) => `/surveys/${uuid}/question`,
+    }),
 
+    shareSurvey: builder.mutation<ShareResponse, string>({
+      query: (surveyUuid) => ({
+        url: "/surveys/share",
+        method: "POST",
+        body: { surveyUuid },
+        credentials: "include",
+      }),
+    }),
 
   }),
 })
 
-export const { useCreateSurveyMutation, useGetSurveysQuery,useCreateQuestionsMutation, useGetQuestionsBySurveyUuidQuery } = surveyApi
+export const { useCreateSurveyMutation, useGetSurveysQuery, useCreateQuestionsMutation, useGetQuestionsBySurveyUuidQuery, useShareSurveyMutation} = surveyApi
