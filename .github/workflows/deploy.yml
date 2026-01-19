@@ -1,0 +1,61 @@
+name: Frontend CI/CD Build and Deploy
+
+on:
+  push:
+    branches: [ "cicd2026" ] # Or main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and Push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/survey-frontend:latest
+          # PASS THE API URL HERE
+          build-args: |
+            NEXT_PUBLIC_API_URL=https://sa-api.supersurvey.live/api/v1
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH and Deploy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VM_IP }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # 1. Move to where your frontend docker-compose is
+            cd /home/${{ secrets.VM_USER }}online_survey/SA-Online-Survey-V1/
+            
+            export DOCKER_USER=${{ secrets.DOCKERHUB_USERNAME }}
+
+            git pull
+            
+            # 2. Pull new image
+            docker compose pull frontend
+            
+            # 3. Restart the service
+            docker compose up -d frontend
+            
+            # 4. Cleanup
+            docker image prune -f
