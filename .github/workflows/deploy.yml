@@ -45,7 +45,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             # 1. Move to where your frontend docker-compose is
-            cd /home/${{ secrets.VM_USER }}online_survey/SA-Online-Survey-V1/
+            cd /home/${{ secrets.VM_USER }}/online_survey/SA-Online-Survey-V1/
             
             export DOCKER_USER=${{ secrets.DOCKERHUB_USERNAME }}
 
