@@ -55,6 +55,25 @@ interface SurveysContentResponse {
   page: PageInfo
 }
 
+interface ShareResponse {
+  link: string
+  qrCodeUrl: string
+}
+
+interface ResponseSubmission {
+  surveyUuid: string
+  responses: Array<{
+    questionUuid: string
+    answer: string | string[]
+  }>
+}
+
+interface SubmitResponseResult {
+  message: string
+  responseUuid?: string
+}
+
+
 export const surveyApi = createApi({
   reducerPath: "surveyApi",
   baseQuery: baseQueryWithReauth,
@@ -126,7 +145,24 @@ export const surveyApi = createApi({
       }),
     }),
 
+    getPublicSurvey: builder.query<
+      { survey: SurverResponeList; questions: ApiQuestion[] },
+      string
+    >({
+      query: (surveyUuid) => `/surveys/${surveyUuid}/public`,
+    }),
+
+    submitResponse: builder.mutation<SubmitResponseResult, ResponseSubmission>({
+      query: (data) => ({
+        url: `/surveys/${data.surveyUuid}/response`,
+        method: "POST",
+        body: {
+          responses: data.responses,
+        },
+      }),
+    }),
+
   }),
 })
 
-export const { useCreateSurveyMutation, useGetSurveysQuery, useCreateQuestionsMutation, useGetQuestionsBySurveyUuidQuery, useShareSurveyMutation} = surveyApi
+export const { useCreateSurveyMutation, useGetSurveysQuery, useCreateQuestionsMutation, useGetQuestionsBySurveyUuidQuery, useShareSurveyMutation, useGetPublicSurveyQuery, useSubmitResponseMutation} = surveyApi
