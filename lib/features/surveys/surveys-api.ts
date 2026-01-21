@@ -16,6 +16,11 @@ const baseQuery = fetchBaseQuery({
   },
 })
 
+interface ShareResponse {
+  link: string
+  qrCodeUrl: string
+}
+
 const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (
   args,
   api,
@@ -49,6 +54,35 @@ interface SurveysContentResponse {
   content: SurverResponeList[]
   page: PageInfo
 }
+
+interface ShareResponse {
+  link: string
+  qrCodeUrl: string
+}
+
+interface ResponseSubmission {
+  surveyUuid: string
+  responses: Array<{
+    questionUuid: string
+    answer: string | string[]
+  }>
+}
+
+interface SubmitResponseResult {
+  message: string
+  responseUuid?: string
+}
+
+interface PublicSurvey {
+  uuid: string
+  title: string
+  description: string
+  startDate: string | null
+  closeDate: string | null
+  surveyType: string
+  questions: ApiQuestion[]
+}
+
 
 export const surveyApi = createApi({
   reducerPath: "surveyApi",
@@ -109,11 +143,33 @@ export const surveyApi = createApi({
     }),
 
     getQuestionsBySurveyUuid: builder.query<Question[], string>({
-  query: (uuid) => `/surveys/${uuid}/question`,
-})
+      query: (uuid) => `/surveys/${uuid}/question`,
+    }),
 
+    shareSurvey: builder.mutation<ShareResponse, string>({
+      query: (surveyUuid) => ({
+        url: "/surveys/share?stg=prod",
+        method: "POST",
+        body: { surveyUuid },
+        credentials: "include",
+      }),
+    }),
+
+    getPublicSurvey: builder.query<PublicSurvey, string>({
+      query: (slug) => `/surveys/share/${slug}`,
+    }),
+
+    submitResponse: builder.mutation<SubmitResponseResult, ResponseSubmission>({
+      query: (data) => ({
+        url: `/surveys/${data.surveyUuid}/response`,
+        method: "POST",
+        body: {
+          responses: data.responses,
+        },
+      }),
+    }),
 
   }),
 })
 
-export const { useCreateSurveyMutation, useGetSurveysQuery,useCreateQuestionsMutation, useGetQuestionsBySurveyUuidQuery } = surveyApi
+export const { useCreateSurveyMutation, useGetSurveysQuery, useCreateQuestionsMutation, useGetQuestionsBySurveyUuidQuery, useShareSurveyMutation, useGetPublicSurveyQuery, useSubmitResponseMutation} = surveyApi

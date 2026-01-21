@@ -1,67 +1,95 @@
-import React, { useState } from 'react';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Textarea } from '../ui/textarea';
-import { Send, Plus, X } from 'lucide-react';
+"use client"
+
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card } from "@/components/ui/card"
+import { Mail } from "lucide-react"
+
 export function EmailInvite() {
-  const [emails, setEmails] = useState<string[]>([]);
-  const [currentEmail, setCurrentEmail] = useState('');
-  const addEmail = () => {
-    if (currentEmail && currentEmail.includes('@')) {
-      setEmails([...emails, currentEmail]);
-      setCurrentEmail('');
+  const [emails, setEmails] = useState<string[]>([])
+  const [emailInput, setEmailInput] = useState("")
+
+  const handleAddEmail = () => {
+    if (emailInput.trim() && !emails.includes(emailInput)) {
+      setEmails([...emails, emailInput])
+      setEmailInput("")
     }
-  };
-  const removeEmail = (index: number) => {
-    setEmails(emails.filter((_, i) => i !== index));
-  };
-  return <div className="space-y-6 max-w-2xl">
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Recipients
-          </label>
-          <div className="flex gap-2 mb-2">
-            <Input placeholder="Enter email address" value={currentEmail} onChange={e => setCurrentEmail(e.target.value)} onKeyDown={e => e.key === 'Enter' && addEmail()} />
-            <Button onClick={addEmail} variant="outline">
-              <Plus className="h-4 w-4" />
-            </Button>
+  }
+
+  const handleRemoveEmail = (email: string) => {
+    setEmails(emails.filter((e) => e !== email))
+  }
+
+  const handleSendInvites = () => {
+    console.log("Sending invites to:", emails)
+    alert(`Invitations sent to ${emails.length} recipient(s)`)
+    setEmails([])
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="space-y-3">
+        <label className="block text-sm font-medium text-gray-900">
+          Recipient Email Addresses
+        </label>
+        <div className="flex gap-2">
+          <Input
+            placeholder="name@example.com"
+            value={emailInput}
+            onChange={(e) => setEmailInput(e.target.value)}
+            onKeyPress={(e) => {
+              if (e.key === "Enter") {
+                handleAddEmail()
+              }
+            }}
+          />
+          <Button onClick={handleAddEmail} variant="outline">
+            Add Email
+          </Button>
+        </div>
+      </div>
+
+      {emails.length > 0 && (
+        <div className="space-y-2">
+          <h4 className="font-medium text-sm text-gray-900">Recipients</h4>
+          <div className="space-y-2">
+            {emails.map((email) => (
+              <Card key={email} className="p-3 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-gray-400" />
+                  <span className="text-sm text-gray-900">{email}</span>
+                </div>
+                <button
+                  onClick={() => handleRemoveEmail(email)}
+                  className="text-gray-400 hover:text-red-500 text-sm"
+                >
+                  Remove
+                </button>
+              </Card>
+            ))}
           </div>
-
-          {emails.length > 0 && <div className="flex flex-wrap gap-2 p-3 bg-gray-50 rounded-md border border-gray-200 min-h-[60px]">
-              {emails.map((email, i) => <div key={i} className="flex items-center gap-1 bg-white px-2 py-1 rounded border border-gray-200 text-sm">
-                  <span>{email}</span>
-                  <button onClick={() => removeEmail(i)} className="text-gray-400 hover:text-red-500">
-                    <X className="h-3 w-3" />
-                  </button>
-                </div>)}
-            </div>}
-          <p className="text-xs text-gray-500 mt-1">
-            Enter email addresses individually or upload a CSV list.
-          </p>
         </div>
+      )}
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Subject
-          </label>
-          <Input defaultValue="Invitation to participate in a survey" />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Message
-          </label>
-          <Textarea className="min-h-[150px]" defaultValue="Hi there,\n\nI would appreciate your feedback on this survey. It will only take a few minutes to complete.\n\nClick the button below to start." />
-        </div>
+      <div className="space-y-3 pt-4 border-t border-gray-100">
+        <label className="block text-sm font-medium text-gray-900">
+          Message (Optional)
+        </label>
+        <textarea
+          placeholder="Add a personal message..."
+          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#00a368] focus:border-transparent"
+          rows={4}
+        />
       </div>
 
-      <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
-        <Button variant="outline">Preview Email</Button>
-        <Button className="bg-[#00a368] hover:bg-[#008f5b]" disabled={emails.length === 0}>
-          <Send className="h-4 w-4 mr-2" />
-          Send Invitations
-        </Button>
-      </div>
-    </div>;
+      <Button
+        onClick={handleSendInvites}
+        disabled={emails.length === 0}
+        className="w-full bg-[#00a368] hover:bg-[#008f5b] text-white"
+      >
+        Send Invitations ({emails.length})
+      </Button>
+    </div>
+  )
 }
