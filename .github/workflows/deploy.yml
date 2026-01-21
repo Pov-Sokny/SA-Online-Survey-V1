@@ -49,8 +49,9 @@ jobs:
             
             export DOCKER_USER=${{ secrets.DOCKERHUB_USERNAME }}
 
+            git checkout cicd2026
             git pull
-            
+          
             # 2. Pull new image
             docker compose pull frontend
             
