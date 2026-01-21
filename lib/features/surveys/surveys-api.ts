@@ -73,6 +73,16 @@ interface SubmitResponseResult {
   responseUuid?: string
 }
 
+interface PublicSurvey {
+  uuid: string
+  title: string
+  description: string
+  startDate: string | null
+  closeDate: string | null
+  surveyType: string
+  questions: ApiQuestion[]
+}
+
 
 export const surveyApi = createApi({
   reducerPath: "surveyApi",
@@ -138,18 +148,15 @@ export const surveyApi = createApi({
 
     shareSurvey: builder.mutation<ShareResponse, string>({
       query: (surveyUuid) => ({
-        url: "/surveys/share",
+        url: "/surveys/share?stg=prod",
         method: "POST",
         body: { surveyUuid },
         credentials: "include",
       }),
     }),
 
-    getPublicSurvey: builder.query<
-      { survey: SurverResponeList; questions: ApiQuestion[] },
-      string
-    >({
-      query: (surveyUuid) => `/surveys/${surveyUuid}/public`,
+    getPublicSurvey: builder.query<PublicSurvey, string>({
+      query: (slug) => `/surveys/share/${slug}`,
     }),
 
     submitResponse: builder.mutation<SubmitResponseResult, ResponseSubmission>({

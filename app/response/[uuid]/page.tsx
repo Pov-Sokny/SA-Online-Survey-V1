@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
 import { CheckCircle2, AlertCircle, Loader } from "lucide-react"
+import { MOCK_SURVEY } from "@/lib/constants/mock-survey" // Import MOCK_SURVEY
 
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -14,14 +15,7 @@ import { Label } from "@/components/ui/label"
 import { Progress } from "@/components/ui/progress"
 
 import { useGetPublicSurveyQuery, useSubmitResponseMutation } from "@/lib/features/surveys/surveys-api"
-import { mockSurveyQuestions, mockSurveyMetadata } from "@/lib/mock-data/survey-mock"
 import type { ApiQuestion } from "@/lib/types/survey-type"
-
-// Mock data for testing - using the centralized mock data
-const MOCK_SURVEY = {
-  survey: mockSurveyMetadata,
-  questions: mockSurveyQuestions,
-}
 
 interface FormData {
   [questionUuid: string]: string | string[]
@@ -31,13 +25,16 @@ export default function SurveyResponsePage() {
   const { uuid } = useParams<{ uuid: string }>()
   const [formData, setFormData] = useState<FormData>({})
   const [submitted, setSubmitted] = useState(false)
-  const [currentStep, setCurrentStep] = useState(0)
 
-  // Use mock data for testing
-  const survey = MOCK_SURVEY.survey
-  const questions = MOCK_SURVEY.questions
+  // Fetch survey data from API
+  const { data: survey, isLoading, isError, error } = useGetPublicSurveyQuery(uuid || "", {
+    skip: !uuid,
+  })
 
   const [submitResponse, { isLoading: isSubmitting }] = useSubmitResponseMutation()
+
+  // Sort questions by orderIndex - create a copy first to avoid mutating read-only array
+  const questions = [...(survey?.questions || [])].sort((a, b) => a.orderIndex - b.orderIndex)
 
   const handleSingleChoice = (questionUuid: string, value: string) => {
     setFormData((prev) => ({
@@ -78,7 +75,7 @@ export default function SurveyResponsePage() {
         }))
 
       await submitResponse({
-        surveyUuid: uuid || MOCK_SURVEY.survey.uuid,
+        surveyUuid: survey?.uuid || "",
         responses,
       }).unwrap()
 
@@ -112,6 +109,42 @@ export default function SurveyResponsePage() {
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mb-6">
             Your response has been submitted successfully. We appreciate your feedback.
+          </p>
+          <Button className="w-full bg-[#00a368] hover:bg-[#008f5b] text-white">
+            Back to Home
+          </Button>
+        </Card>
+      </div>
+    )
+  }
+
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 flex items-center justify-center p-4">
+        <div className="text-center">
+          <Loader className="h-12 w-12 animate-spin text-[#00a368] mx-auto mb-4" />
+          <p className="text-gray-600 dark:text-gray-400">Loading survey...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Error state
+  if (isError || !survey) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md text-center p-8 shadow-lg">
+          <div className="mb-6 flex justify-center">
+            <div className="rounded-full bg-red-100 dark:bg-red-900 p-4">
+              <AlertCircle className="h-12 w-12 text-red-600 dark:text-red-400" />
+            </div>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-50 mb-2">
+            Survey Not Found
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
+            The survey you are looking for does not exist or has been closed.
           </p>
           <Button className="w-full bg-[#00a368] hover:bg-[#008f5b] text-white">
             Back to Home
