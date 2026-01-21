@@ -2,7 +2,7 @@ name: Frontend CI/CD Build and Deploy
 
 on:
   push:
-    branches: [ "cicd2026" ] # Or main
+    branches: [ "deploy" ] # Or main
 
 jobs:
   build-and-push:
@@ -49,7 +49,7 @@ jobs:
             
             export DOCKER_USER=${{ secrets.DOCKERHUB_USERNAME }}
 
-            git checkout cicd2026
+            git checkout deploy
             git pull
           
             # 2. Pull new image
