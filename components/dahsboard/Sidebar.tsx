@@ -40,22 +40,22 @@ export function Sidebar() {
     },
     {
       title: "Responses",
-      href: "/responses",
+      href: "/user/responses",
       icon: MessageSquare,
     },
     {
       title: "Analytics",
-      href: "/analytics",
+      href: "/user/analytics",
       icon: BarChart3,
     },
     {
       title: "Integrations",
-      href: "/integrations",
+      href: "/user/integrations",
       icon: Plug,
     },
     {
       title: "Notifications",
-      href: "/notifications",
+      href: "/user/notifications",
       icon: Bell,
       badge: 3,
     },
@@ -63,17 +63,17 @@ export function Sidebar() {
   const bottomNavItems = [
     {
       title: "Settings",
-      href: "/settings",
+      href: "/user/settings",
       icon: Settings,
     },
     {
       title: "Help Center",
-      href: "/help",
+      href: "/user/help",
       icon: HelpCircle,
     },
     {
       title: "Admin",
-      href: "/admin/users",
+      href: "/user/admin/users",
       icon: Shield,
     },
   ]
