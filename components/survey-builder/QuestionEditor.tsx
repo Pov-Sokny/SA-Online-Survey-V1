@@ -1,19 +1,19 @@
 "use client"
 
-"use client"
-
 import { useState } from "react"
 import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { QuestionCard } from "@/components/survey-builder/QuestionCard"
+import { AiGenerateModal } from "@/components/survey-builder/AiGeneratorModal"
 import type { BuilderQuestion } from "@/lib/types/survey-type"
 
 interface QuestionEditorProps {
+  surveyTitle: string
   questions: BuilderQuestion[]
   setQuestions: (questions: BuilderQuestion[]) => void
 }
 
-export function QuestionEditor({ questions, setQuestions }: QuestionEditorProps) {
+export function QuestionEditor({ surveyTitle, questions, setQuestions }: QuestionEditorProps) {
   const [activeQuestionId, setActiveQuestionId] = useState<string | null>(
     questions && questions.length > 0 ? questions[0]?.uuid : null
   )
@@ -79,6 +79,24 @@ export function QuestionEditor({ questions, setQuestions }: QuestionEditorProps)
     setActiveQuestionId(newUuid)
   }
 
+  const handleQuestionsGenerated = (generatedQuestions: BuilderQuestion[]) => {
+    // Update orderIndex for generated questions
+    const currentQuestions = questions || []
+    const updatedGenerated = generatedQuestions.map((q, idx) => ({
+      ...q,
+      orderIndex: currentQuestions.length + idx,
+    }))
+    
+    // Append generated questions to existing ones
+    const newQuestions = [...currentQuestions, ...updatedGenerated]
+    setQuestions(newQuestions)
+    
+    // Set active to first generated question
+    if (updatedGenerated.length > 0) {
+      setActiveQuestionId(updatedGenerated[0].uuid)
+    }
+  }
+
   return (
     <div className="max-w-3xl mx-auto pb-20">
       <div className="space-y-4">
@@ -95,7 +113,7 @@ export function QuestionEditor({ questions, setQuestions }: QuestionEditorProps)
         ))}
       </div>
 
-      <div className="mt-6 flex justify-center">
+      <div className="mt-6 flex justify-center gap-3">
         <Button
           onClick={addQuestion}
           className="bg-[#00a368] hover:bg-[#008f5b] text-white shadow-lg rounded-full px-6 py-6"
@@ -103,6 +121,10 @@ export function QuestionEditor({ questions, setQuestions }: QuestionEditorProps)
           <Plus className="h-6 w-6 mr-2" />
           Add New Question
         </Button>
+        <AiGenerateModal
+          surveyTitle={surveyTitle}
+          onQuestionsGenerated={handleQuestionsGenerated}
+        />
       </div>
     </div>
   )

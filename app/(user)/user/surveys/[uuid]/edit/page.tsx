@@ -16,6 +16,7 @@ import { SettingsTab } from "@/components/survey-builder/SettingsTab"
 import {
   useCreateQuestionsMutation,
   useGetQuestionsBySurveyUuidQuery,
+  useGetSurveysQuery,
 } from "@/lib/features/surveys/surveys-api"
 
 import { mapApiQuestionsToBuilder } from "@/lib/types/mapApiQuestionToBuilder"
@@ -28,6 +29,13 @@ export default function SurveyEditorPage() {
 
   const [activeTab, setActiveTab] = useState("questions")
   const [questions, setQuestions] = useState<BuilderQuestion[]>([])
+  const [surveyTitle, setSurveyTitle] = useState("")
+
+  // Fetch survey details to get title
+  const {
+    data: surveysData,
+    isLoading: surveysLoading,
+  } = useGetSurveysQuery({})
 
   const {
     data,
@@ -45,6 +53,18 @@ export default function SurveyEditorPage() {
       setQuestions(mapApiQuestionsToBuilder(data))
     }
   }, [data])
+
+  // Extract survey title from surveys list
+  useEffect(() => {
+    if (surveysData?.content) {
+      const survey = surveysData.content.find(
+        (s) => s.uuid === surveyUuid
+      )
+      if (survey) {
+        setSurveyTitle(survey.title)
+      }
+    }
+  }, [surveysData, surveyUuid])
 
   if (!surveyUuid) {
     return (
@@ -153,6 +173,7 @@ export default function SurveyEditorPage() {
 
             <TabsContent value="questions" className="mt-0 p-6">
               <QuestionEditor
+                surveyTitle={surveyTitle}
                 questions={questions}
                 setQuestions={setQuestions}
               />
