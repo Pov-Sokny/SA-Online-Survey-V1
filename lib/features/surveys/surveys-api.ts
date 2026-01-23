@@ -159,6 +159,11 @@ export const surveyApi = createApi({
       query: (slug) => `/surveys/share/${slug}`,
     }),
 
+    // ADD THIS ENDPOINT
+    getSurveyByUuid: builder.query<SurveyResponse, string>({
+      query: (uuid) => `/surveys/${uuid}`,
+    }),
+
     submitResponse: builder.mutation<SubmitResponseResult, ResponseSubmission>({
       query: (data) => ({
         url: `/surveys/${data.surveyUuid}/response`,
@@ -172,4 +177,7 @@ export const surveyApi = createApi({
   }),
 })
 
-export const { useCreateSurveyMutation, useGetSurveysQuery, useCreateQuestionsMutation, useGetQuestionsBySurveyUuidQuery, useShareSurveyMutation, useGetPublicSurveyQuery, useSubmitResponseMutation} = surveyApi
+export const { useCreateSurveyMutation, useGetSurveysQuery,
+  useCreateQuestionsMutation, useGetQuestionsBySurveyUuidQuery,
+  useShareSurveyMutation, useGetPublicSurveyQuery,
+  useSubmitResponseMutation, useGetSurveyByUuidQuery } = surveyApi

@@ -16,7 +16,7 @@ import { SettingsTab } from "@/components/survey-builder/SettingsTab"
 import {
   useCreateQuestionsMutation,
   useGetQuestionsBySurveyUuidQuery,
-  useGetSurveysQuery,
+  useGetSurveyByUuidQuery,
 } from "@/lib/features/surveys/surveys-api"
 
 import { mapApiQuestionsToBuilder } from "@/lib/types/mapApiQuestionToBuilder"
@@ -31,41 +31,51 @@ export default function SurveyEditorPage() {
   const [questions, setQuestions] = useState<BuilderQuestion[]>([])
   const [surveyTitle, setSurveyTitle] = useState("")
 
-  // Fetch survey details to get title
+  /** =======================
+   *  FETCH SURVEY (TITLE)
+   *  ======================= */
   const {
-    data: surveysData,
-    isLoading: surveysLoading,
-  } = useGetSurveysQuery({})
+    data: surveyData,
+    isLoading: surveyLoading,
+  } = useGetSurveyByUuidQuery(surveyUuid, {
+    skip: !surveyUuid,
+  })
 
+  /** =======================
+   *  FETCH QUESTIONS
+   *  ======================= */
   const {
-    data,
-    isLoading,
-    isError,
+    data: questionsData,
+    isLoading: questionsLoading,
+    isError: questionsError,
   } = useGetQuestionsBySurveyUuidQuery(surveyUuid, {
     skip: !surveyUuid,
   })
 
+  /** =======================
+   *  MUTATIONS
+   *  ======================= */
   const [createQuestions, { isLoading: isSaving }] =
     useCreateQuestionsMutation()
 
+  /** =======================
+   *  EFFECTS
+   *  ======================= */
   useEffect(() => {
-    if (data) {
-      setQuestions(mapApiQuestionsToBuilder(data))
+    if (surveyData?.title) {
+      setSurveyTitle(surveyData.title)
     }
-  }, [data])
+  }, [surveyData])
 
-  // Extract survey title from surveys list
   useEffect(() => {
-    if (surveysData?.content) {
-      const survey = surveysData.content.find(
-        (s) => s.uuid === surveyUuid
-      )
-      if (survey) {
-        setSurveyTitle(survey.title)
-      }
+    if (questionsData) {
+      setQuestions(mapApiQuestionsToBuilder(questionsData))
     }
-  }, [surveysData, surveyUuid])
+  }, [questionsData])
 
+  /** =======================
+   *  LOADING / ERROR STATES
+   *  ======================= */
   if (!surveyUuid) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -74,15 +84,15 @@ export default function SurveyEditorPage() {
     )
   }
 
-  if (isLoading) {
+  if (surveyLoading || questionsLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        Loading questions...
+        Loading...
       </div>
     )
   }
 
-  if (isError) {
+  if (questionsError) {
     return (
       <div className="flex items-center justify-center min-h-screen text-red-500">
         Failed to load questions
@@ -90,6 +100,9 @@ export default function SurveyEditorPage() {
     )
   }
 
+  /** =======================
+   *  HANDLERS
+   *  ======================= */
   const handleSave = async () => {
     try {
       const payload = mapBuilderQuestionsToApi(questions)
@@ -106,6 +119,9 @@ export default function SurveyEditorPage() {
     }
   }
 
+  /** =======================
+   *  RENDER
+   *  ======================= */
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <header className="bg-white border-b sticky top-0 z-40">
@@ -125,7 +141,6 @@ export default function SurveyEditorPage() {
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Preview */}
             <Link href={`/user/surveys/${surveyUuid}/preview`}>
               <Button variant="ghost" size="sm">
                 <Eye className="h-4 w-4 mr-2" />
@@ -133,7 +148,6 @@ export default function SurveyEditorPage() {
               </Button>
             </Link>
 
-            {/* Share */}
             <Link href={`/user/surveys/${surveyUuid}/share`}>
               <Button variant="ghost" size="sm">
                 <Share2 className="h-4 w-4 mr-2" />
@@ -141,7 +155,6 @@ export default function SurveyEditorPage() {
               </Button>
             </Link>
 
-            {/* Save */}
             <Button
               onClick={handleSave}
               disabled={isSaving}
@@ -159,15 +172,9 @@ export default function SurveyEditorPage() {
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <div className="bg-white border-b sticky top-16 z-30">
               <TabsList className="justify-start rounded-none bg-transparent p-0 h-auto">
-                <TabsTrigger value="questions">
-                  Questions
-                </TabsTrigger>
-                <TabsTrigger value="responses">
-                  Responses
-                </TabsTrigger>
-                <TabsTrigger value="settings">
-                  Settings
-                </TabsTrigger>
+                <TabsTrigger value="questions">Questions</TabsTrigger>
+                <TabsTrigger value="responses">Responses</TabsTrigger>
+                <TabsTrigger value="settings">Settings</TabsTrigger>
               </TabsList>
             </div>
 

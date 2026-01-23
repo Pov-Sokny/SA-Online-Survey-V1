@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
 import { CheckCircle2, AlertCircle, Loader } from "lucide-react"
-import { MOCK_SURVEY } from "@/lib/constants/mock-survey" // Import MOCK_SURVEY
+//import { MOCK_SURVEY } from "@/lib/constants/mock-survey" // Import MOCK_SURVEY
 
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
