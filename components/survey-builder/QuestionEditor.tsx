@@ -13,22 +13,27 @@ interface QuestionEditorProps {
   setQuestions: (questions: BuilderQuestion[]) => void
 }
 
-export function QuestionEditor({ surveyTitle, questions, setQuestions }: QuestionEditorProps) {
+export function QuestionEditor({
+  surveyTitle,
+  questions,
+  setQuestions,
+}: QuestionEditorProps) {
   const [activeQuestionId, setActiveQuestionId] = useState<string | null>(
-    questions && questions.length > 0 ? questions[0]?.uuid : null
+    questions?.[0]?.uuid ?? null
   )
 
+  /** ✅ ADD NEW QUESTION (NO UUID) */
   const addQuestion = () => {
-    const tempUuid = `temp_${Date.now()}`
     const newQuestion: BuilderQuestion = {
-      uuid: tempUuid,
-      type: "single_choice" as const,
+      // ❌ NO uuid here
+      type: "single_choice",
       title: "",
       description: "",
       required: false,
+      orderIndex: questions.length,
       options: [
         {
-          uuid: `temp_option_${Date.now()}`,
+          //uuid: '', // ❌ NO uuid here
           text: "Option 1",
           orderIndex: 0,
         },
@@ -39,73 +44,71 @@ export function QuestionEditor({ surveyTitle, questions, setQuestions }: Questio
       symbol: "star",
       isLong: false,
       validationType: "none",
-      orderIndex: (questions?.length || 0),
     }
-    setQuestions([...(questions || []), newQuestion])
-    setActiveQuestionId(tempUuid)
+
+    setQuestions([...questions, newQuestion])
+    setActiveQuestionId(null)
   }
 
-  const updateQuestion = (uuid: string, updates: any) => {
+  /** ✅ UPDATE (UUID NEVER CHANGES) */
+  const updateQuestion = (uuid: string | undefined, updates: Partial<BuilderQuestion>) => {
     setQuestions(
-      (questions || []).map((q) =>
-        q.uuid === uuid
-          ? {
-              ...q,
-              ...updates,
-            }
-          : q,
-      ),
+      questions.map((q) =>
+        q.uuid === uuid ? { ...q, ...updates } : q
+      )
     )
   }
 
-  const deleteQuestion = (uuid: string) => {
-    setQuestions((questions || []).filter((q) => q.uuid !== uuid))
+  /** ✅ DELETE */
+  const deleteQuestion = (uuid?: string) => {
+    setQuestions(questions.filter((q) => q.uuid !== uuid))
     if (activeQuestionId === uuid) {
       setActiveQuestionId(null)
     }
   }
 
-  const duplicateQuestion = (question: any) => {
-    const newUuid = crypto.randomUUID()
-    const newQuestion = {
+  /** ✅ DUPLICATE = NEW QUESTION (NO UUID, NO OPTION UUIDs) */
+  const duplicateQuestion = (question: BuilderQuestion) => {
+    const duplicated: BuilderQuestion = {
       ...question,
-      uuid: newUuid,
+      uuid: undefined, // 🔥 IMPORTANT
       title: `${question.title} (Copy)`,
+      options: question.options.map((o) => ({
+        ...o,
+        uuid: undefined, // 🔥 IMPORTANT
+      })),
+      orderIndex: questions.length,
     }
-    const index = (questions || []).findIndex((q) => q.uuid === question.uuid)
-    const newQuestions = [...(questions || [])]
-    newQuestions.splice(index + 1, 0, newQuestion)
-    setQuestions(newQuestions)
-    setActiveQuestionId(newUuid)
+
+    setQuestions([...questions, duplicated])
+    setActiveQuestionId(null)
   }
 
-  const handleQuestionsGenerated = (generatedQuestions: BuilderQuestion[]) => {
-    // Update orderIndex for generated questions
-    const currentQuestions = questions || []
-    const updatedGenerated = generatedQuestions.map((q, idx) => ({
+  /** ✅ AI GENERATED = NEW QUESTIONS */
+  const handleQuestionsGenerated = (generated: BuilderQuestion[]) => {
+    const normalized = generated.map((q, idx) => ({
       ...q,
-      orderIndex: currentQuestions.length + idx,
+      uuid: undefined,
+      options: q.options.map((o) => ({
+        ...o,
+        uuid: undefined,
+      })),
+      orderIndex: questions.length + idx,
     }))
-    
-    // Append generated questions to existing ones
-    const newQuestions = [...currentQuestions, ...updatedGenerated]
-    setQuestions(newQuestions)
-    
-    // Set active to first generated question
-    if (updatedGenerated.length > 0) {
-      setActiveQuestionId(updatedGenerated[0].uuid)
-    }
+
+    setQuestions([...questions, ...normalized])
+    setActiveQuestionId(null)
   }
 
   return (
     <div className="max-w-3xl mx-auto pb-20">
       <div className="space-y-4">
-        {(questions || []).map((question) => (
+        {questions.map((question, index) => (
           <QuestionCard
-            key={question.uuid}
+            key={question.uuid ?? index}
             question={question}
             isActive={activeQuestionId === question.uuid}
-            onClick={() => setActiveQuestionId(question.uuid)}
+            onClick={() => setActiveQuestionId(question.uuid ?? null)}
             onUpdate={(updates) => updateQuestion(question.uuid, updates)}
             onDelete={() => deleteQuestion(question.uuid)}
             onDuplicate={() => duplicateQuestion(question)}
@@ -121,6 +124,7 @@ export function QuestionEditor({ surveyTitle, questions, setQuestions }: Questio
           <Plus className="h-6 w-6 mr-2" />
           Add New Question
         </Button>
+
         <AiGenerateModal
           surveyTitle={surveyTitle}
           onQuestionsGenerated={handleQuestionsGenerated}

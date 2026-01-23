@@ -1,19 +1,43 @@
-import type { BuilderQuestion, ApiQuestionType } from "./survey-type"
+import type { /*BuilderQuestion*/ ApiQuestionType } from "./survey-type"
+
+export interface BuilderQuestion {
+  uuid?: string
+  type: string
+  title: string
+  description?: string
+  required: boolean
+  orderIndex: number
+  options: {
+    uuid?: string
+    text: string
+    orderIndex: number
+  }[]
+}
 
 export function mapBuilderQuestionsToApi(questions: BuilderQuestion[]) {
-  return questions.map((q, index) => ({
+  return questions.map((q, qIndex) => ({
+    // ✅ send uuid ONLY if it's a real backend uuid
+    ...(isRealUuid(q.uuid) ? { uuid: q.uuid } : {}),
+
     questionText: q.title,
     questionType: mapType(q.type),
     isRequired: q.required,
-    orderIndex: index + 1,
+    orderIndex: qIndex + 1,
+
     options:
-      q.type === "single_choice" || q.type === "multiple_choice"
-        ? q.options?.map((o, i) => ({
-            optionText: o.text || o.optionText,
-            orderIndex: i + 1,
-          })) ?? []
-        : [],
+      q.options?.map((o, oIndex) => ({
+        ...(isRealUuid(o.uuid) ? { uuid: o.uuid } : {}),
+        optionText: o.text,
+        orderIndex: oIndex + 1,
+      })) ?? [],
   }))
+}
+
+/** ✅ helper */
+function isRealUuid(uuid?: string) {
+  if (!uuid) return false
+  if (uuid.startsWith("temp_")) return false
+  return true
 }
 
 function mapType(type: BuilderQuestion["type"]): ApiQuestionType {
