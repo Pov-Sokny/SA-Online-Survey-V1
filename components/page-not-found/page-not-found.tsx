@@ -8,7 +8,7 @@ export default function NotFound() {
     <div
       className="relative min-h-screen w-full flex items-center justify-center bg-cover bg-center"
       style={{
-        backgroundImage: "url('/not-found/test1.jpg')",
+        backgroundImage: "url('https://resource.supersurvey.live/api/v1/files/background/smooth?type=BGLOGIN')",
       }}
     >
       <div className="absolute inset-0 bg-gradient-to-br from-black/30 via-black/20 to-black/20" />
