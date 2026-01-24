@@ -75,8 +75,8 @@ jobs:
           # We use a multi-line variable to preserve your formatting and handle special characters
           MESSAGE="🎉 *NEW ACTION!* 🎉
           ----------------------------------------
-          • *Project* : \`API\`
-          • *Domain* : \`sa-api.supersurvey.live\`
+          • *Project* : \`Frontend\`
+          • *Domain* : \`supersurvey.live\`
           • *Repository* : \`${{ github.repository }}\`
           • *Author* : \`${{ github.actor }}\`
           • *Branch* : \`${{ github.ref_name }}\`
