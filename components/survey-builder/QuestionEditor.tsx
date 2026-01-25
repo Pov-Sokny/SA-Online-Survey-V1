@@ -47,22 +47,24 @@ export function QuestionEditor({
     }
 
     setQuestions([...questions, newQuestion])
-    setActiveQuestionId(null)
+    // Make the new question active so user can immediately edit
+    setActiveQuestionId(`temp_${questions.length}`)
   }
 
-  /** ✅ UPDATE (UUID NEVER CHANGES) */
-  const updateQuestion = (uuid: string | undefined, updates: Partial<BuilderQuestion>) => {
+  /** ✅ UPDATE - Use index for questions without UUID */
+  const updateQuestion = (index: number, updates: Partial<BuilderQuestion>) => {
     setQuestions(
-      questions.map((q) =>
-        q.uuid === uuid ? { ...q, ...updates } : q
+      questions.map((q, i) =>
+        i === index ? { ...q, ...updates } : q
       )
     )
   }
 
-  /** ✅ DELETE */
-  const deleteQuestion = (uuid?: string) => {
-    setQuestions(questions.filter((q) => q.uuid !== uuid))
-    if (activeQuestionId === uuid) {
+  /** ✅ DELETE - Use index for questions without UUID */
+  const deleteQuestion = (index: number) => {
+    setQuestions(questions.filter((_, i) => i !== index))
+    const questionId = questions[index]?.uuid ?? `temp_${index}`
+    if (activeQuestionId === questionId) {
       setActiveQuestionId(null)
     }
   }
@@ -73,7 +75,7 @@ export function QuestionEditor({
       ...question,
       uuid: undefined, // 🔥 IMPORTANT
       title: `${question.title} (Copy)`,
-      options: question.options.map((o) => ({
+      options: question.options?.map((o) => ({
         ...o,
         uuid: undefined, // 🔥 IMPORTANT
       })),
@@ -81,7 +83,8 @@ export function QuestionEditor({
     }
 
     setQuestions([...questions, duplicated])
-    setActiveQuestionId(null)
+    // Make the duplicated question active so user can immediately edit
+    setActiveQuestionId(`temp_${questions.length}`)
   }
 
   /** ✅ AI GENERATED = NEW QUESTIONS */
@@ -89,31 +92,38 @@ export function QuestionEditor({
     const normalized = generated.map((q, idx) => ({
       ...q,
       uuid: undefined,
-      options: q.options.map((o) => ({
+      options: q.options?.map((o) => ({
         ...o,
         uuid: undefined,
       })),
       orderIndex: questions.length + idx,
     }))
 
-    setQuestions([...questions, ...normalized])
-    setActiveQuestionId(null)
+    const updatedQuestions = [...questions, ...normalized]
+    setQuestions(updatedQuestions)
+    // Set the first generated question as active so user can immediately edit
+    if (normalized.length > 0) {
+      setActiveQuestionId(`temp_${questions.length}`)
+    }
   }
 
   return (
     <div className="max-w-3xl mx-auto pb-20">
       <div className="space-y-4">
-        {questions.map((question, index) => (
-          <QuestionCard
-            key={question.uuid ?? index}
-            question={question}
-            isActive={activeQuestionId === question.uuid}
-            onClick={() => setActiveQuestionId(question.uuid ?? null)}
-            onUpdate={(updates) => updateQuestion(question.uuid, updates)}
-            onDelete={() => deleteQuestion(question.uuid)}
-            onDuplicate={() => duplicateQuestion(question)}
-          />
-        ))}
+        {questions.map((question, index) => {
+          const questionId = question.uuid ?? `temp_${index}`
+          return (
+            <QuestionCard
+              key={questionId}
+              question={question}
+              isActive={activeQuestionId === questionId}
+              onClick={() => setActiveQuestionId(questionId)}
+              onUpdate={(updates) => updateQuestion(index, updates)}
+              onDelete={() => deleteQuestion(index)}
+              onDuplicate={() => duplicateQuestion(question)}
+            />
+          )
+        })}
       </div>
 
       <div className="mt-6 flex justify-center gap-3">

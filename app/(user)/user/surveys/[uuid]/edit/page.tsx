@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 
 import { QuestionEditor } from "@/components/survey-builder/QuestionEditor"
+import { QuestionEditor1 } from "@/components/survey-builder/QuestionEditor1"
 import { ResponsesTab } from "@/components/survey-builder/ResponsesTab"
 import { SettingsTab } from "@/components/survey-builder/SettingsTab"
 

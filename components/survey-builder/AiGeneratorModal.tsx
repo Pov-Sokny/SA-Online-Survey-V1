@@ -151,24 +151,40 @@ export function AiGenerateModal({
     apiQuestions: any[],
     selectedType: string
   ): BuilderQuestion[] => {
+    console.log("[v0] Transforming API questions:", apiQuestions)
+    console.log("[v0] Selected type:", selectedType)
+    
     return (apiQuestions || []).map((q, index) => {
+      console.log("[v0] Processing question:", q)
+      
       const baseQuestion: BuilderQuestion = {
-        uuid: `temp_${Date.now()}_${index}`,
+        // Don't set uuid - let QuestionEditor handle it
         type: selectedType as any,
-        title: q.questionText,
-        description: "",
-        required: q.isRequired || true,
+        title: q.questionText || q.title || "",
+        description: q.description || "",
+        required: q.isRequired !== undefined ? q.isRequired : true,
         orderIndex: index,
         validationType: "none",
       }
 
-      // Add options if they exist
-      if (q.options && q.options.length > 0) {
-        baseQuestion.options = q.options.map((opt: any, idx: number) => ({
-          uuid: `temp_option_${Date.now()}_${idx}`,
-          text: opt.optionText,
+      // Add options if they exist (check multiple possible formats)
+      const options = q.options || q.choices || []
+      if (options && options.length > 0) {
+        baseQuestion.options = options.map((opt: any, idx: number) => ({
+          // Don't set uuid - let QuestionEditor handle it
+          text: opt.optionText || opt.text || opt.value || `Option ${idx + 1}`,
           orderIndex: idx,
         }))
+        console.log("[v0] Added options:", baseQuestion.options)
+      } else if (selectedType === "single_choice" || selectedType === "multiple_choice") {
+        // If type requires options but none provided, add default ones
+        baseQuestion.options = [
+          { text: "Option 1", orderIndex: 0 },
+          { text: "Option 2", orderIndex: 1 },
+          { text: "Option 3", orderIndex: 2 },
+          { text: "Option 4", orderIndex: 3 },
+        ]
+        console.log("[v0] No options found, added defaults")
       }
 
       // Add matrix rows/columns if needed
@@ -183,6 +199,7 @@ export function AiGenerateModal({
         baseQuestion.symbol = q.symbol || "star"
       }
 
+      console.log("[v0] Final transformed question:", baseQuestion)
       return baseQuestion
     })
   }
