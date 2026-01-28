@@ -14,7 +14,13 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Progress } from "@/components/ui/progress"
 
-import { useGetPublicSurveyQuery, useSubmitResponseMutation } from "@/lib/features/surveys/surveys-api"
+import {
+  useGetPublicSurveyQuery,
+  useSubmitPublicResponseMutation,
+} from "@/lib/features/surveys/public-survey-api"
+
+
+//import { useGetPublicSurveyQuery, useSubmitResponseMutation } from "@/lib/features/surveys/surveys-api"
 import type { ApiQuestion } from "@/lib/types/survey-type"
 
 interface FormData {
@@ -30,8 +36,9 @@ export default function SurveyResponsePage() {
   const { data: survey, isLoading, isError, error } = useGetPublicSurveyQuery(uuid || "", {
     skip: !uuid,
   })
+const [submitResponse, { isLoading: isSubmitting }] =
+  useSubmitPublicResponseMutation()
 
-  const [submitResponse, { isLoading: isSubmitting }] = useSubmitResponseMutation()
 
   // Sort questions by orderIndex - create a copy first to avoid mutating read-only array
   const questions = [...(survey?.questions || [])].sort((a, b) => a.orderIndex - b.orderIndex)

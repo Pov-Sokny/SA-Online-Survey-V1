@@ -6,6 +6,7 @@ import { filesApi } from "./features/files/files-api"
 import filesReducer from "./features/files/files-slice"
 import surveyReducer from "./features/surveys/survey-slice"
 import { surveyApi } from "./features/surveys/surveys-api"
+import { publicSurveyApi } from "./features/surveys/public-survey-api"
 
 export const makeStore = () => {
   const store = configureStore({
@@ -16,9 +17,16 @@ export const makeStore = () => {
       files: filesReducer,
       [surveyApi.reducerPath]: surveyApi.reducer,
       survey: surveyReducer,
+      [publicSurveyApi.reducerPath]: publicSurveyApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware().concat(authApi.middleware, filesApi.middleware, surveyApi.middleware),
+      getDefaultMiddleware().concat(
+        authApi.middleware,
+        filesApi.middleware,
+        surveyApi.middleware,
+        publicSurveyApi.middleware // ✅ REQUIRED
+      ),
+
   })
 
   setupListeners(store.dispatch)

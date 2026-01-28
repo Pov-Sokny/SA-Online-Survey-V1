@@ -148,7 +148,7 @@ export const surveyApi = createApi({
 
     shareSurvey: builder.mutation<ShareResponse, string>({
       query: (surveyUuid) => ({
-        url: "/surveys/share?stg=prod",
+        url: "/surveys/share?stg=dev",
         method: "POST",
         body: { surveyUuid },
         credentials: "include",
