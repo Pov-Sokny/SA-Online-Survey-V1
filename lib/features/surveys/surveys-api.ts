@@ -83,6 +83,17 @@ interface PublicSurvey {
   questions: ApiQuestion[]
 }
 
+export interface Survey {
+  uuid: string
+  title: string
+  description: string
+  status?: "active" | "draft" | "closed"
+  isPublic: boolean
+  totalResponse: number
+  createdDate?: string
+  lastModifiedDate?: string
+  thumbnail?: string | null
+}
 
 export const surveyApi = createApi({
   reducerPath: "surveyApi",
@@ -174,10 +185,41 @@ export const surveyApi = createApi({
       }),
     }),
 
+    // in surveyApi endpoints
+    updateSurveyStatus: builder.mutation<
+      { message: string },
+      string
+    >({
+      query: (uuid) => ({
+        url: `/surveys/${uuid}/status`,
+        method: "PUT",
+        credentials: "include",
+      }),
+      invalidatesTags: ["Survey"],
+    }),
+
+    toggleSurveyPublic: builder.mutation<
+      Survey,
+      { uuid: string }
+    >({
+      query: ({ uuid }) => ({
+        url: `/surveys/${uuid}/status`,
+        method: "PUT",
+      }),
+
+      invalidatesTags: ["Survey"],
+    }),
+
+
+
+
   }),
 })
 
 export const { useCreateSurveyMutation, useGetSurveysQuery,
   useCreateQuestionsMutation, useGetQuestionsBySurveyUuidQuery,
   useShareSurveyMutation, useGetPublicSurveyQuery,
-  useSubmitResponseMutation, useGetSurveyByUuidQuery } = surveyApi
+  useSubmitResponseMutation, useGetSurveyByUuidQuery,
+  useUpdateSurveyStatusMutation,
+  useToggleSurveyPublicMutation
+} = surveyApi

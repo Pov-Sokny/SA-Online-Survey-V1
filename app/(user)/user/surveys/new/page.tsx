@@ -36,32 +36,32 @@ export default function NewSurveyPage() {
   const [isUploading, setIsUploading] = useState(false)
 
   /* ---------------- Upload Image ---------------- */
-  const handleUploadImage = async () => {
-    if (!imageFile) return
+  // const handleUploadImage = async () => {
+  //   if (!imageFile) return
 
-    setIsUploading(true)
-    try {
-      const formData = new FormData()
-      formData.append("file", imageFile)
+  //   setIsUploading(true)
+  //   try {
+  //     const formData = new FormData()
+  //     formData.append("file", imageFile)
 
-      const res = await fetch(
-        "https://resource.supersurvey.live/api/v1/files",
-        { method: "POST", body: formData }
-      )
+  //     const res = await fetch(
+  //       "https://resource.supersurvey.live/api/v1/files?resize=SD&compress=true&level=MEDIUM&type=SURVEY",
+  //       { method: "POST", body: formData }
+  //     )
 
-      if (!res.ok) throw new Error("Upload failed")
-      const data = await res.json()
+  //     if (!res.ok) throw new Error("Upload failed")
+  //     const data = await res.json()
 
-      setUploadedImageName(data.name)
-      toast.success("Image uploaded successfully")
-    } catch (err: any) {
-      toast.error("Image upload failed", {
-        description: err.message || "Try again",
-      })
-    } finally {
-      setIsUploading(false)
-    }
-  }
+  //     setUploadedImageName(data.name)
+  //     toast.success("Image uploaded successfully")
+  //   } catch (err: any) {
+  //     toast.error("Image upload failed", {
+  //       description: err.message || "Try again",
+  //     })
+  //   } finally {
+  //     setIsUploading(false)
+  //   }
+  // }
 
   /* ---------------- Create Survey ---------------- */
   const handleCreateSurvey = async (e: React.FormEvent) => {
@@ -75,7 +75,7 @@ export default function NewSurveyPage() {
         formData.append("file", imageFile)
 
         const res = await fetch(
-          "https://resource.supersurvey.live/api/v1/files",
+          "https://resource.supersurvey.live/api/v1/files?resize=SD&compress=true&level=MEDIUM&type=SURVEY",
           { method: "POST", body: formData }
         )
 

@@ -1,5 +1,9 @@
 "use client"
 
+import { useState } from "react"
+import Image from "next/image"
+import Link from "next/link"
+
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -9,6 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+
 import {
   MoreHorizontal,
   MessageSquare,
@@ -19,10 +24,10 @@ import {
   Copy,
   Trash2,
   Archive,
+  FolderInput,
+  Lock,
+  Globe,
 } from "lucide-react"
-import Link from "next/link"
-import Image from "next/image"
-import { useState } from "react"
 
 /* ---------------- Types ---------------- */
 
@@ -31,21 +36,28 @@ export interface Survey {
   title: string
   description: string
   status?: "active" | "draft" | "closed"
+  isPublic: boolean
   totalResponse: number
   createdDate?: string
   lastModifiedDate?: string
   thumbnail?: string | null
 }
 
+interface SurveyCardProps {
+  survey: Survey
+  onDuplicate: (survey: Survey) => void
+  onDelete: (survey: Survey) => void
+  onArchive: (survey: Survey) => void
+  onMove: (survey: Survey) => void
+  onTogglePublic: (survey: Survey) => void
+}
+
 /* ---------------- Utils ---------------- */
 
 function formatDateTime(value?: string) {
   if (!value) return "—"
-
   const date = new Date(value)
   if (isNaN(date.getTime())) return "—"
-
-  const hasTime = value.includes("T")
 
   const datePart = date.toLocaleDateString(undefined, {
     year: "numeric",
@@ -53,7 +65,7 @@ function formatDateTime(value?: string) {
     day: "2-digit",
   })
 
-  if (!hasTime) return datePart
+  if (!value.includes("T")) return datePart
 
   const timePart = date.toLocaleTimeString(undefined, {
     hour: "2-digit",
@@ -63,16 +75,7 @@ function formatDateTime(value?: string) {
   return `${datePart} • ${timePart}`
 }
 
-
 /* ---------------- Component ---------------- */
-
-interface SurveyCardProps {
-  survey: Survey
-  onDuplicate: (survey: Survey) => void
-  onDelete: (survey: Survey) => void
-  onArchive: (survey: Survey) => void
-  onMove: (survey: Survey) => void
-}
 
 export function SurveyCard({
   survey,
@@ -80,18 +83,25 @@ export function SurveyCard({
   onDelete,
   onArchive,
   onMove,
+  onTogglePublic,
 }: SurveyCardProps) {
   const [imgLoaded, setImgLoaded] = useState(false)
 
   const thumbnailSrc =
-    survey.thumbnail && survey.thumbnail.trim() !== ""
-      ? survey.thumbnail
-      : "https://resource.supersurvey.live/api/v1/files/background/smooth?type=BGSURVEY"
+    survey.thumbnail?.trim() ||
+    "https://resource.supersurvey.live/api/v1/files/background/smooth?type=BGSURVEY"
 
-  const statusColors = {
-    active: "bg-green-100 text-green-800",
-    draft: "bg-gray-100 text-gray-800",
-    closed: "bg-red-100 text-red-800",
+  const publicBadge = survey.isPublic
+    ? { label: "PUBLIC", className: "bg-blue-100 text-blue-800" }
+    : { label: "DRAFT", className: "bg-gray-100 text-gray-800" }
+
+    console.log("Survey:", survey.title, survey.isPublic, typeof survey.isPublic)
+
+
+  const handleCopyShareLink = async () => {
+    if (!survey.isPublic) return
+    const url = `${window.location.origin}/surveys/share/${survey.uuid}`
+    await navigator.clipboard.writeText(url)
   }
 
   return (
@@ -113,26 +123,11 @@ export function SurveyCard({
           onLoadingComplete={() => setImgLoaded(true)}
         />
 
-        {survey.status && (
-          <div className="absolute top-2 right-2 z-10">
-            <Badge className={statusColors[survey.status]}>
-              {survey.status.toUpperCase()}
-            </Badge>
-          </div>
-        )}
-
-        {/* Hover Actions */}
-        <div className="absolute inset-0 z-10 flex items-center justify-center gap-2 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
-          <Link href={`/user/surveys/${survey.uuid}/edit`}>
-            <Button size="sm" variant="secondary">
-              Edit
-            </Button>
-          </Link>
-          <Link href={`/surveys/${survey.uuid}/preview`}>
-            <Button size="sm" variant="secondary">
-              Preview
-            </Button>
-          </Link>
+        {/* Public / Draft Badge */}
+        <div className="absolute top-2 right-2 z-10">
+          <Badge className={publicBadge.className}>
+            {publicBadge.label}
+          </Badge>
         </div>
       </div>
 
@@ -148,29 +143,57 @@ export function SurveyCard({
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="p-1 rounded-full hover:bg-gray-100 text-gray-400">
+              <button
+                type="button"
+                className="p-1 rounded-full hover:bg-gray-100 text-gray-400"
+              >
                 <MoreHorizontal className="h-4 w-4" />
               </button>
             </DropdownMenuTrigger>
+
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>
-                <Edit className="h-4 w-4 mr-2" /> Edit
+              <DropdownMenuItem asChild>
+                <Link href={`/user/surveys/${survey.uuid}/edit`}>
+                  <Edit className="h-4 w-4 mr-2" /> Edit
+                </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Eye className="h-4 w-4 mr-2" /> Preview
+
+              <DropdownMenuItem asChild>
+                <Link href={`/surveys/${survey.uuid}/preview`}>
+                  <Eye className="h-4 w-4 mr-2" /> Preview
+                </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Share2 className="h-4 w-4 mr-2" /> Share
+
+              {survey.isPublic && (
+                <DropdownMenuItem onClick={handleCopyShareLink}>
+                  <Share2 className="h-4 w-4 mr-2" /> Copy share link
+                </DropdownMenuItem>
+              )}
+
+              <DropdownMenuItem onClick={() => onTogglePublic(survey)}>
+                {survey.isPublic ? (
+                  <>
+                    <Lock className="h-4 w-4 mr-2" /> Make Private
+                  </>
+                ) : (
+                  <>
+                    <Globe className="h-4 w-4 mr-2" /> Make Public
+                  </>
+                )}
               </DropdownMenuItem>
+
               <DropdownMenuItem onClick={() => onDuplicate(survey)}>
                 <Copy className="h-4 w-4 mr-2" /> Duplicate
               </DropdownMenuItem>
+
               <DropdownMenuItem onClick={() => onMove(survey)}>
-                <Copy className="h-4 w-4 mr-2" /> Move to...
+                <FolderInput className="h-4 w-4 mr-2" /> Move to…
               </DropdownMenuItem>
+
               <DropdownMenuItem onClick={() => onArchive(survey)}>
                 <Archive className="h-4 w-4 mr-2" /> Archive
               </DropdownMenuItem>
+
               <DropdownMenuItem
                 onClick={() => onDelete(survey)}
                 className="text-red-600"

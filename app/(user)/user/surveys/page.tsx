@@ -43,6 +43,8 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination"
 
+import { useUpdateSurveyStatusMutation, useToggleSurveyPublicMutation } from "@/lib/features/surveys/surveys-api"
+import { PublicSurveyConfirmDialog, } from "@/components/modal/PublicSurveyConfirmDialog"
 
 /* ---------------- Types ---------------- */
 type ViewMode = "grid" | "list"
@@ -71,6 +73,27 @@ export default function SurveysPage() {
   const [pageNumber, setPageNumber] = useState(0)
   const pageSize = 8
 
+  /* ---------- Toggle Survey Status ---------- */
+  const [toggleSurvey, setToggleSurvey] = useState<Survey | null>(null)
+  useUpdateSurveyStatusMutation()
+  const [toggleSurveyPublic] = useToggleSurveyPublicMutation()
+
+  /* ---------- functiion handle Confirm Toggle ---------- */
+  const handleConfirmToggle = async () => {
+  if (!toggleSurvey) return
+  try {
+    await toggleSurveyPublic({
+      uuid: toggleSurvey.uuid,
+    }).unwrap()
+  } catch (e) {
+    console.error(e)
+  } finally {
+    setToggleSurvey(null)
+  }
+}
+
+
+  /* ---------- Effects ---------- */
   useEffect(() => {
     setPageNumber(0)
   }, [debouncedSearch, sortBy, orderBy])
@@ -255,6 +278,7 @@ export default function SurveysPage() {
                   <SurveyCard
                     key={s.uuid}
                     survey={s}
+                    onTogglePublic={setToggleSurvey} 
                     onDuplicate={setDuplicateSurvey}
                     onDelete={setDeleteSurvey}
                     onArchive={setArchiveSurvey}
@@ -360,6 +384,15 @@ export default function SurveysPage() {
           onConfirm={() => { }}
         />
       )}
+
+      {toggleSurvey && (
+      <PublicSurveyConfirmDialog
+        open
+        isPublic={toggleSurvey.status === "active"}
+        onClose={() => setToggleSurvey(null)}
+        onConfirm={handleConfirmToggle}
+      />
+    )}
 
       <MoveSurveyDialog
         isOpen={isMoveOpen}
