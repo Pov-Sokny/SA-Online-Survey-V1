@@ -117,6 +117,9 @@ export default function SurveysPage() {
     title: s.title,
     description: s.description,
 
+    // ✅ VERY IMPORTANT
+    isPublic: s.isPublic,
+
     status: s.isClosed
       ? "closed"
       : s.isPublic
@@ -125,13 +128,17 @@ export default function SurveysPage() {
 
     totalResponse: s.totalResponse ?? 0,
 
-    // ✅ PASS RAW API DATES
     createdDate: s.createdDate,
     lastModifiedDate: s.lastModifiedDate,
 
     thumbnail: s.thumbnail,
   }))
 }, [data])
+
+
+
+
+console.log("RAW API SURVEY:", data?.content?.[0])
 
 
   /* ---------- Selection ---------- */
