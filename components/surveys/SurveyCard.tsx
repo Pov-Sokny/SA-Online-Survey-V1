@@ -104,6 +104,16 @@ export function SurveyCard({
     await navigator.clipboard.writeText(url)
   }
 
+  const handleShareClick = () => {
+  if (!survey.isPublic) {
+    onTogglePublic(survey) // open confirm modal
+    return
+  }
+
+  window.location.href = `/surveys/${survey.uuid}/share`
+}
+
+
   return (
     <Card className="group flex flex-col overflow-hidden transition-shadow hover:shadow-md">
       {/* ---------- Thumbnail ---------- */}

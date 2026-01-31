@@ -24,6 +24,11 @@ import { mapApiQuestionsToBuilder } from "@/lib/types/mapApiQuestionToBuilder"
 import { mapBuilderQuestionsToApi } from "@/lib/types/mapBuilderQuestionsToApi"
 import type { BuilderQuestion } from "@/lib/types/survey-type"
 
+import { useRouter } from "next/navigation"
+import { useToggleSurveyPublicMutation } from "@/lib/features/surveys/surveys-api"
+import { PublicSurveyConfirmDialog } from "@/components/modal/PublicSurveyConfirmDialog"
+
+
 export default function SurveyEditorPage() {
   const { uuid } = useParams<{ uuid: string }>()
   const surveyUuid = uuid
@@ -31,6 +36,11 @@ export default function SurveyEditorPage() {
   const [activeTab, setActiveTab] = useState("questions")
   const [questions, setQuestions] = useState<BuilderQuestion[]>([])
   const [surveyTitle, setSurveyTitle] = useState("")
+
+  const router = useRouter()
+  const [toggleOpen, setToggleOpen] = useState(false)
+  const [toggleSurveyPublic] = useToggleSurveyPublicMutation()
+
 
   /** =======================
    *  FETCH SURVEY (TITLE)
@@ -120,6 +130,28 @@ export default function SurveyEditorPage() {
     }
   }
 
+  const handleShareClick = () => {
+    if (!surveyData?.isPublic) {
+      setToggleOpen(true) // open confirm modal
+      return
+    }
+
+    router.push(`/user/surveys/${surveyUuid}/share`)
+  }
+
+  const handleConfirmMakePublic = async () => {
+    try {
+      await toggleSurveyPublic({ uuid: surveyUuid }).unwrap()
+      setToggleOpen(false)
+      router.push(`/user/surveys/${surveyUuid}/share`)
+    } catch (err) {
+      console.error(err)
+      alert("Failed to make survey public")
+    }
+  }
+
+
+
   /** =======================
    *  RENDER
    *  ======================= */
@@ -149,12 +181,18 @@ export default function SurveyEditorPage() {
               </Button>
             </Link>
 
-            <Link href={`/user/surveys/${surveyUuid}/share`}>
+            {/* <Link href={`/user/surveys/${surveyUuid}/share`}>
               <Button variant="ghost" size="sm">
                 <Share2 className="h-4 w-4 mr-2" />
                 Share
               </Button>
-            </Link>
+            </Link> */}
+
+            <Button variant="ghost" size="sm" onClick={handleShareClick}>
+              <Share2 className="h-4 w-4 mr-2" />
+              Share
+            </Button>
+
 
             <Button
               onClick={handleSave}
@@ -195,6 +233,16 @@ export default function SurveyEditorPage() {
               <SettingsTab />
             </TabsContent>
           </Tabs>
+
+          {toggleOpen && (
+            <PublicSurveyConfirmDialog
+              open
+              isPublic={false}
+              onClose={() => setToggleOpen(false)}
+              onConfirm={handleConfirmMakePublic}
+            />
+          )}
+
         </div>
       </main>
     </div>
