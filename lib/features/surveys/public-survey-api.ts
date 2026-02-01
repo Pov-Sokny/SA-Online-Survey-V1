@@ -17,14 +17,21 @@ export interface PublicSurvey {
   questions: ApiQuestion[]
 }
 
-export interface PublicSurveyResponse {
-  questionUuid: string
-  answer: string
+export interface SubmitSurveyPayload {
+  startTime: string
+  surveyUuid: string
+  fingerprint: string
+  browserUuid: string
+  answers: {
+    questionUuid: string
+    optionUuid: string[]
+    answerText: string | null
+  }[]
 }
 
-export interface SubmitPublicSurveyPayload {
-  surveyUuid: string
-  responses: PublicSurveyResponse[]
+export interface SubmitResponseResult {
+  message: string
+  responseUuid?: string
 }
 
 /* =========================
@@ -34,41 +41,36 @@ export interface SubmitPublicSurveyPayload {
 export const publicSurveyApi = createApi({
   reducerPath: "publicSurveyApi",
 
-  // 🚨 PUBLIC API — NO AUTH, NO COOKIES
+  // 🚨 PUBLIC API — NO AUTH
   baseQuery: fetchBaseQuery({
     baseUrl: API_BASE_URL,
     credentials: "omit",
     prepareHeaders: (headers) => {
       headers.set("Content-Type", "application/json")
+      headers.delete("Authorization") // 🔥 VERY IMPORTANT
       return headers
     },
   }),
 
-  tagTypes: ["PublicSurvey"],
-
   endpoints: (builder) => ({
     /* -------- Get public survey -------- */
     getPublicSurvey: builder.query<PublicSurvey, string>({
-      query: (slage) => `/surveys/share/${slage}`,
-      providesTags: (_result, _error, uuid) => [
-        { type: "PublicSurvey", id: uuid },
-      ],
+      query: (uuid) => `/surveys/share/${uuid}`,
     }),
 
-    /* -------- Submit survey response -------- */
-    submitPublicResponse: builder.mutation<
-      { message: string },
-      SubmitPublicSurveyPayload
+    /* -------- Submit response -------- */
+    submitResponse: builder.mutation<
+      SubmitResponseResult,
+      SubmitSurveyPayload
     >({
-      query: ({ surveyUuid, responses }) => ({
-        url: `/surveys/${surveyUuid}/response`,
+      query: (body) => ({
+        url: "/responses/submit",
         method: "POST",
-        body: { responses },
+        body,
       }),
-      invalidatesTags: (_result, _error, { surveyUuid }) => [
-        { type: "PublicSurvey", id: surveyUuid },
-      ],
     }),
+
+    
   }),
 })
 
@@ -78,5 +80,5 @@ export const publicSurveyApi = createApi({
 
 export const {
   useGetPublicSurveyQuery,
-  useSubmitPublicResponseMutation,
+  useSubmitResponseMutation,
 } = publicSurveyApi

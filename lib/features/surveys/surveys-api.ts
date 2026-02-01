@@ -95,6 +95,18 @@ export interface Survey {
   thumbnail?: string | null
 }
 
+interface SubmitSurveyPayload {
+  startTime: string;
+  surveyUuid: string;
+  fingerprint: string;
+  browserUuid: string;
+  answers: {
+    questionUuid: string;
+    optionUuid: string[];
+    answerText: string | null;
+  }[];
+}
+
 export const surveyApi = createApi({
   reducerPath: "surveyApi",
   baseQuery: baseQueryWithReauth,
@@ -175,15 +187,17 @@ export const surveyApi = createApi({
       query: (uuid) => `/surveys/${uuid}`,
     }),
 
-    submitResponse: builder.mutation<SubmitResponseResult, ResponseSubmission>({
-      query: (data) => ({
-        url: `/surveys/${data.surveyUuid}/response`,
+    submitResponse: builder.mutation<
+      SubmitResponseResult,
+      SubmitSurveyPayload
+    >({
+      query: (body) => ({
+        url: "/responses/submit", // ✅ FIXED
         method: "POST",
-        body: {
-          responses: data.responses,
-        },
+        body,
       }),
     }),
+
 
     // in surveyApi endpoints
     updateSurveyStatus: builder.mutation<
