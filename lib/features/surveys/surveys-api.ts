@@ -187,16 +187,16 @@ export const surveyApi = createApi({
       query: (uuid) => `/surveys/${uuid}`,
     }),
 
-    submitResponse: builder.mutation<
-      SubmitResponseResult,
-      SubmitSurveyPayload
-    >({
-      query: (body) => ({
-        url: "/responses/submit", // ✅ FIXED
-        method: "POST",
-        body,
-      }),
-    }),
+    // submitResponse: builder.mutation<
+    //   SubmitResponseResult,
+    //   SubmitSurveyPayload
+    // >({
+    //   query: (body) => ({
+    //     url: "/responses/submit", // ✅ FIXED
+    //     method: "POST",
+    //     body,
+    //   }),
+    // }),
 
 
     // in surveyApi endpoints
@@ -224,6 +224,17 @@ export const surveyApi = createApi({
       invalidatesTags: ["Survey"],
     }),
 
+
+    submitResponse: builder.mutation<
+  SubmitResponseResult,
+  SubmitSurveyPayload
+>({
+  query: (body) => ({
+    url: "/responses/submit",
+    method: "POST",
+    body,
+  }),
+}),
 
 
 

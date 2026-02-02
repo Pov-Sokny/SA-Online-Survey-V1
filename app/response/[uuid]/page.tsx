@@ -67,59 +67,61 @@ export default function SurveyResponsePage() {
   /* ======================
      SUBMIT
   ====================== */
-  const handleSubmit = async () => {
+const handleSubmit = async () => {
   try {
     if (!survey?.uuid) return
 
-    const answers = questions.flatMap((q) => {
-      const value = formData[q.uuid]
-      if (!value) return []
+    const answers = questions
+      .map((q) => {
+        const value = formData[q.uuid]
+        if (!value) return null
 
-      if (q.questionType === "SINGLE_CHOICE") {
-        return [{
+        if (q.questionType === "SINGLE_CHOICE") {
+          return {
+            questionUuid: q.uuid,
+            optionUuid: [value as string],
+            answerText: null,
+          }
+        }
+
+        if (q.questionType === "MULTIPLE_CHOICE") {
+          return {
+            questionUuid: q.uuid,
+            optionUuid: value as string[],
+            answerText: null,
+          }
+        }
+
+        return {
           questionUuid: q.uuid,
-          optionUuid: [value as string],
-          answerText: null,
-        }]
-      }
-
-      if (q.questionType === "MULTIPLE_CHOICE") {
-        return [{
-          questionUuid: q.uuid,
-          optionUuid: value as string[],
-          answerText: null,
-        }]
-      }
-
-      return [{
-        questionUuid: q.uuid,
-        optionUuid: [],
-        answerText: value as string,
-      }]
-    })
-
-    if (answers.length === 0) {
-      alert("No answers to submit")
-      return
-    }
+          optionUuid: [],
+          answerText: value as string,
+        }
+      })
+      .filter(Boolean)
 
     const fingerprint = await getFingerprint()
     const browserUuid = getBrowserUuid()
 
+    console.log("Submitting with fingerprint:", fingerprint);
+    console.log("Browser UUID:", browserUuid);
+
     await submitResponse({
-      surveyUuid: survey.uuid, // ✅ used only for URL
+      surveyUuid: survey.uuid,
       startTime: new Date().toISOString(),
       fingerprint,
       browserUuid,
-      answers,
+      answers, // ✅ can be empty
     }).unwrap()
 
     setSubmitted(true)
-  } catch (err) {
-    console.error("Submit failed:", err)
+  } catch (error) {
+    console.error("Submit failed:", error)
     alert("Submit failed ❌")
   }
 }
+
+
 
 
   /* ======================
