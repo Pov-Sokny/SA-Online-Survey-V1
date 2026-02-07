@@ -54,13 +54,25 @@ export const publicSurveyApi = createApi({
 
   endpoints: (builder) => ({
     /* -------- Get public survey -------- */
-    getPublicSurvey: builder.query<PublicSurvey, string>({
-      query: (uuid) => ({
+    getPublicSurvey: builder.query<
+      PublicSurvey,
+      {
+        uuid: string
+        fingerprint: string
+        browserUuid: string
+      }
+    >({
+      query: ({ uuid, fingerprint, browserUuid }) => ({
         url: `/responses/share/${uuid}`,
         method: "POST",
-        body: null
+        body: {
+          fingerprint,
+          browserUuid,
+        },
       }),
     }),
+
+
 
 
     /* -------- Submit response -------- */
