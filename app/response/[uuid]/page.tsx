@@ -4,35 +4,32 @@ import { useEffect, useMemo, useState } from "react"
 import { useParams } from "next/navigation"
 import { skipToken } from "@reduxjs/toolkit/query"
 import {
-  CheckCircle2,
   AlertCircle,
+  CheckCircle2,
   Loader,
-  ClipboardCheck,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { Textarea } from "@/components/ui/textarea"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Progress } from "@/components/ui/progress"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Textarea } from "@/components/ui/textarea"
 
 import {
   useGetPublicSurveyQuery,
   useSubmitResponseMutation,
 } from "@/lib/features/surveys/public-survey-api"
-
 import type { ApiQuestion } from "@/lib/types/survey-type"
+
 import { getFingerprint } from "@/utils/fingerpint"
 import { getBrowserUuid } from "@/utils/broswerUuid"
 
 /* ======================
    TYPES
 ====================== */
-interface FormData {
-  [questionUuid: string]: string | string[]
-}
+type FormData = Record<string, string | string[]>
 
 /* ======================
    PAGE
@@ -48,28 +45,31 @@ export default function SurveyResponsePage() {
   const [browserUuid, setBrowserUuid] = useState<string | null>(null)
 
   /* ======================
-     INIT IDENTITY (ONCE)
+     INIT CLIENT IDENTITY
   ====================== */
   useEffect(() => {
-    const init = async () => {
-      const fp = await getFingerprint()
-      const bu = getBrowserUuid()
-
-      setFingerprint(fp)
-      setBrowserUuid(bu)
-    }
-
-    init()
+    ;(async () => {
+      setFingerprint(await getFingerprint())
+      setBrowserUuid(getBrowserUuid())
+    })()
   }, [])
 
   /* ======================
-     FETCH SURVEY (POST)
+     FETCH SURVEY
   ====================== */
-  const { data: survey, isLoading, isError } = useGetPublicSurveyQuery(
+  const {
+    data: survey,
+    isLoading,
+    error: fetchError,
+  } = useGetPublicSurveyQuery(
     fingerprint && browserUuid && uuid
       ? { uuid, fingerprint, browserUuid }
       : skipToken
   )
+
+  const status = (fetchError as any)?.status
+  const isAlreadySubmitted = status === 409
+  const isNotFound = status === 404
 
   const [submitResponse, { isLoading: isSubmitting }] =
     useSubmitResponseMutation()
@@ -83,18 +83,11 @@ export default function SurveyResponsePage() {
     )
   }, [survey])
 
-  /* ======================
-     FORM HELPERS
-  ====================== */
-  const setAnswer = (questionUuid: string, value: string | string[]) => {
-    setFormData((prev) => ({ ...prev, [questionUuid]: value }))
-  }
-
   const requiredQuestions = questions.filter((q) => q.isRequired)
 
   const filledRequiredCount = requiredQuestions.filter((q) => {
-    const v = formData[q.uuid]
-    return Array.isArray(v) ? v.length > 0 : Boolean(v)
+    const value = formData[q.uuid]
+    return Array.isArray(value) ? value.length > 0 : Boolean(value)
   }).length
 
   const progress =
@@ -103,53 +96,62 @@ export default function SurveyResponsePage() {
       : (filledRequiredCount / requiredQuestions.length) * 100
 
   /* ======================
+     HELPERS
+  ====================== */
+  const setAnswer = (questionUuid: string, value: string | string[]) => {
+    setFormData((prev) => ({ ...prev, [questionUuid]: value }))
+  }
+
+  const buildAnswers = () =>
+    questions
+      .map((q) => {
+        const value = formData[q.uuid]
+        if (!value) return null
+
+        if (q.questionType === "SINGLE_CHOICE") {
+          return {
+            questionUuid: q.uuid,
+            optionUuid: [value as string],
+            answerText: null,
+          }
+        }
+
+        if (q.questionType === "MULTIPLE_CHOICE") {
+          return {
+            questionUuid: q.uuid,
+            optionUuid: value as string[],
+            answerText: null,
+          }
+        }
+
+        return {
+          questionUuid: q.uuid,
+          optionUuid: [],
+          answerText: value as string,
+        }
+      })
+      .filter(Boolean)
+
+  /* ======================
      SUBMIT
   ====================== */
   const handleSubmit = async () => {
+    if (!survey || !fingerprint || !browserUuid) return
+
     try {
       setError(null)
-      if (!survey || !fingerprint || !browserUuid) return
-
-      const answers = questions
-        .map((q) => {
-          const value = formData[q.uuid]
-          if (!value) return null
-
-          if (q.questionType === "SINGLE_CHOICE") {
-            return {
-              questionUuid: q.uuid,
-              optionUuid: [value as string],
-              answerText: null,
-            }
-          }
-
-          if (q.questionType === "MULTIPLE_CHOICE") {
-            return {
-              questionUuid: q.uuid,
-              optionUuid: value as string[],
-              answerText: null,
-            }
-          }
-
-          return {
-            questionUuid: q.uuid,
-            optionUuid: [],
-            answerText: value as string,
-          }
-        })
-        .filter(Boolean)
 
       await submitResponse({
         surveyUuid: survey.uuid,
         startTime: new Date().toISOString(),
         fingerprint,
         browserUuid,
-        answers,
+        answers: buildAnswers(),
       }).unwrap()
 
       setSubmitted(true)
-    } catch (err) {
-      console.error(err)
+    } catch (err: any) {
+      if (err?.status === 409) return
       setError("Failed to submit survey. Please try again.")
     }
   }
@@ -157,80 +159,99 @@ export default function SurveyResponsePage() {
   /* ======================
      STATES
   ====================== */
+  if (isLoading) {
+    return (
+      <Centered>
+        <Loader className="h-8 w-8 animate-spin text-gray-500" />
+      </Centered>
+    )
+  }
+
+  if (isAlreadySubmitted) {
+    return (
+
+      <Centered>
+        <Card className="p-8 text-center">
+          <CheckCircle2 className="mx-auto h-16 w-16 text-emerald-600 mb-4" />
+          <h2 className="text-2xl font-bold mb-2">Survey already submitted</h2>
+          <p className="text-gray-600">
+            You have already completed this survey, Thank you 
+          </p>
+        </Card>
+      </Centered>
+    )
+  }
+
+  if (isNotFound) {
+    return (
+      <Centered>
+        <Card className="p-8 text-center">
+          <AlertCircle className="mx-auto h-12 w-12 text-red-500 mb-3" />
+          <h2 className="text-xl font-bold">
+            Survey not found
+          </h2>
+        </Card>
+      </Centered>
+    )
+  }
+
   if (submitted) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-teal-50 p-4">
-        <Card className="max-w-md w-full p-8 text-center shadow-xl border-0">
+      <Centered>
+        <Card className="p-8 text-center">
           <CheckCircle2 className="mx-auto h-16 w-16 text-emerald-600 mb-4" />
           <h2 className="text-2xl font-bold mb-2">Thank you!</h2>
           <p className="text-gray-600">
             Your response has been submitted successfully.
           </p>
         </Card>
-      </div>
+      </Centered>
     )
   }
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader className="h-10 w-10 animate-spin text-emerald-600" />
-      </div>
-    )
-  }
-
-  if (isError || !survey) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="p-8 text-center">
-          <AlertCircle className="mx-auto h-12 w-12 text-red-500 mb-3" />
-          <h2 className="text-xl font-bold">Survey not found</h2>
-        </Card>
-      </div>
-    )
-  }
+  if (!survey) return null
 
   /* ======================
      RENDER
   ====================== */
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-emerald-50/30">
+    <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <div className="sticky top-0 bg-white border-b z-10">
-        <div className="max-w-3xl mx-auto px-4 py-4">
-          <div className="flex gap-3">
-            <div className="h-10 w-10 rounded-xl bg-emerald-600 flex items-center justify-center">
-              <ClipboardCheck className="h-5 w-5 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold">{survey.title}</h1>
-              {survey.description && (
-                <p className="text-gray-600">{survey.description}</p>
-              )}
-            </div>
-          </div>
+      <div className="border-b bg-white">
+        <div className="max-w-2xl mx-auto px-4 py-6">
+          <h1 className="text-3xl font-bold mb-2">
+            {survey.title}
+          </h1>
+
+          {survey.description && (
+            <p className="text-gray-600 mb-4">
+              {survey.description}
+            </p>
+          )}
 
           {requiredQuestions.length > 0 && (
-            <div className="mt-4">
+            <>
+              <div className="flex justify-between text-sm text-gray-600 mb-2">
+                <span>Progress</span>
+                <span>
+                  {filledRequiredCount}/{requiredQuestions.length}
+                </span>
+              </div>
               <Progress value={progress} />
-            </div>
+            </>
           )}
         </div>
       </div>
 
       {/* Questions */}
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
-        {questions.length === 0 && (
-          <Card className="p-4 text-gray-600 text-center">
-            This survey has no questions. Click submit to continue.
-          </Card>
-        )}
-
         {questions.map((q, index) => (
           <Card key={q.uuid} className="p-4">
             <h3 className="font-semibold mb-3">
               {index + 1}. {q.questionText}
-              {q.isRequired && <span className="text-red-500 ml-1">*</span>}
+              {q.isRequired && (
+                <span className="text-red-500 ml-1">*</span>
+              )}
             </h3>
 
             {q.questionType === "SINGLE_CHOICE" && (
@@ -239,10 +260,10 @@ export default function SurveyResponsePage() {
                 onValueChange={(v) => setAnswer(q.uuid, v)}
               >
                 {q.options.map((o) => (
-                  <div key={o.uuid} className="flex items-center gap-2">
-                    <RadioGroupItem value={o.uuid} id={o.uuid} />
-                    <Label htmlFor={o.uuid}>{o.optionText}</Label>
-                  </div>
+                  <Label key={o.uuid} className="flex gap-2">
+                    <RadioGroupItem value={o.uuid} />
+                    {o.optionText}
+                  </Label>
                 ))}
               </RadioGroup>
             )}
@@ -250,9 +271,10 @@ export default function SurveyResponsePage() {
             {q.questionType === "MULTIPLE_CHOICE" && (
               <div className="space-y-2">
                 {q.options.map((o) => {
-                  const current = (formData[q.uuid] as string[]) ?? []
+                  const current =
+                    (formData[q.uuid] as string[]) ?? []
                   return (
-                    <div key={o.uuid} className="flex items-center gap-2">
+                    <Label key={o.uuid} className="flex gap-2">
                       <Checkbox
                         checked={current.includes(o.uuid)}
                         onCheckedChange={() =>
@@ -264,8 +286,8 @@ export default function SurveyResponsePage() {
                           )
                         }
                       />
-                      <Label>{o.optionText}</Label>
-                    </div>
+                      {o.optionText}
+                    </Label>
                   )
                 })}
               </div>
@@ -274,29 +296,43 @@ export default function SurveyResponsePage() {
             {q.questionType === "SHORT_ANSWER" && (
               <Textarea
                 value={(formData[q.uuid] as string) ?? ""}
-                onChange={(e) => setAnswer(q.uuid, e.target.value)}
+                onChange={(e) =>
+                  setAnswer(q.uuid, e.target.value)
+                }
               />
             )}
           </Card>
         ))}
 
         {error && (
-          <div className="text-red-600 text-sm flex items-center gap-2">
+          <p className="text-sm text-red-600 flex gap-2">
             <AlertCircle className="h-4 w-4" />
             {error}
-          </div>
+          </p>
         )}
 
         <Button
+          className="w-full h-12"
           onClick={handleSubmit}
           disabled={
-            isSubmitting || filledRequiredCount < requiredQuestions.length
+            isSubmitting ||
+            filledRequiredCount < requiredQuestions.length
           }
-          className="w-full h-12"
         >
           {isSubmitting ? "Submitting..." : "Submit Survey"}
         </Button>
       </div>
+    </div>
+  )
+}
+
+/* ======================
+   SHARED UI
+====================== */
+function Centered({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="min-h-screen flex items-center justify-center p-4">
+      {children}
     </div>
   )
 }
