@@ -7,12 +7,12 @@ export default function QuickActions() {
     label: 'New Survey',
     icon: <Plus className="h-6 w-6 text-white" />,
     color: 'bg-[#00a368]',
-    href: '/surveys/new'
+    href: 'user/surveys/new'
   }, {
     label: 'Use Template',
     icon: <Wand2 className="h-6 w-6 text-white" />,
     color: 'bg-purple-500',
-    href: '/templates'
+    href: 'user/templates'
   }, {
     label: 'Import Data',
     icon: <Upload className="h-6 w-6 text-white" />,
