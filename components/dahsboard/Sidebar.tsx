@@ -73,7 +73,7 @@ export function Sidebar() {
     },
     {
       title: "Admin",
-      href: "/user/admin/users",
+      href: "/user/admin222",
       icon: Shield,
     },
   ]
