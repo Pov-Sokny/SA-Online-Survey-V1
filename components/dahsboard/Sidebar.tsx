@@ -87,7 +87,7 @@ export function Sidebar() {
   return (
     <div className="hidden md:flex w-64 flex-col h-screen sticky top-0 ">
       <div className="flex h-16 items-center border-b px-6">
-        <Link href="/dashboard" className="flex items-center gap-2 font-bold text-xl text-[#00a368]">
+        <Link href="/user" className="flex items-center gap-2 font-bold text-xl text-[#00a368]">
           <Layout className="h-6 w-6" />
           <span>Super Survey</span>
         </Link>
