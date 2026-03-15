@@ -4,10 +4,10 @@ import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, Save, Eye, Share2 } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import { toast } from "sonner"
 
 import { QuestionEditor } from "@/components/survey-builder/QuestionEditor"
 import { QuestionEditor1 } from "@/components/survey-builder/QuestionEditor1"
@@ -123,10 +123,12 @@ export default function SurveyEditorPage() {
         questions: payload,
       }).unwrap()
 
-      alert("Survey saved successfully ✅")
+      //alert("Survey saved successfully ✅")
+      toast.success("Survey saved successfully ✅ 🎉")
     } catch (error) {
       console.error(error)
-      alert("Failed to save survey ❌")
+      //alert("Failed to save survey ❌")
+      toast.error("Failed to save survey ❌")
     }
   }
 
