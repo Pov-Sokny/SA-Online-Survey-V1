@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { UserTable } from "@/components/admin/UserTable"
+//import { UserTable } from "@/components/admin/UserTable"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Plus, Search } from "lucide-react"
@@ -85,7 +85,8 @@ export default function UserManagementPage() {
           />
         </div>
         <div className="flex gap-2">
-          <Select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)} className="w-40">
+
+          {/* <Select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)} className="w-40">
             <SelectTrigger>
               <SelectValue placeholder="Select role" />
             </SelectTrigger>
@@ -112,15 +113,16 @@ export default function UserManagementPage() {
                 <SelectItem value="pending">Pending</SelectItem>
               </SelectGroup>
             </SelectContent>
-          </Select>
+          </Select> */}
+
         </div>
       </div>
 
-      <UserTable
+      {/* <UserTable
         users={filteredUsers}
         onEdit={(user) => console.log("Edit", user)}
         onDelete={(user) => console.log("Delete", user)}
-      />
+      /> */}
     </div>
   )
 }
