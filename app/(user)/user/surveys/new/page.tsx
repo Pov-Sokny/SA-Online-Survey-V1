@@ -34,36 +34,9 @@ export default function NewSurveyPage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [uploadedImageName, setUploadedImageName] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState(false)
+  const isSubmitting = isLoading || isUploading
 
-  /* ---------------- Upload Image ---------------- */
-  // const handleUploadImage = async () => {
-  //   if (!imageFile) return
-
-  //   setIsUploading(true)
-  //   try {
-  //     const formData = new FormData()
-  //     formData.append("file", imageFile)
-
-  //     const res = await fetch(
-  //       "https://resource.supersurvey.live/api/v1/files?resize=SD&compress=true&level=MEDIUM&type=SURVEY",
-  //       { method: "POST", body: formData }
-  //     )
-
-  //     if (!res.ok) throw new Error("Upload failed")
-  //     const data = await res.json()
-
-  //     setUploadedImageName(data.name)
-  //     toast.success("Image uploaded successfully")
-  //   } catch (err: any) {
-  //     toast.error("Image upload failed", {
-  //       description: err.message || "Try again",
-  //     })
-  //   } finally {
-  //     setIsUploading(false)
-  //   }
-  // }
-
-  /* ---------------- Create Survey ---------------- */
+  /* Create new sruvey */
   const handleCreateSurvey = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -71,6 +44,8 @@ export default function NewSurveyPage() {
       let imageName: string | undefined
 
       if (imageFile) {
+        setIsUploading(true)
+
         const formData = new FormData()
         formData.append("file", imageFile)
 
@@ -80,9 +55,11 @@ export default function NewSurveyPage() {
         )
 
         if (!res.ok) throw new Error("Image upload failed")
-        const data = await res.json()
 
+        const data = await res.json()
         imageName = data.name
+
+        setIsUploading(false)
       }
 
       await createSurvey({
@@ -93,7 +70,10 @@ export default function NewSurveyPage() {
 
       toast.success("Survey created 🎉")
       router.push("/user/surveys")
+
     } catch (error: any) {
+      setIsUploading(false)
+
       toast.error("Create survey failed", {
         description: error?.message || "Something went wrong",
       })
@@ -161,9 +141,9 @@ export default function NewSurveyPage() {
             <Button
               type="submit"
               className="bg-[#00a368] hover:bg-[#008f5b] text-white"
-              disabled={isLoading}
+              disabled={isSubmitting}
             >
-              {isLoading ? "Creating..." : "Create Survey"}
+              {isSubmitting ? "Creating..." : "Create Survey"}
             </Button>
 
           </div>
