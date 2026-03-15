@@ -19,8 +19,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 export function Sidebar() {
   const pathname = usePathname()
+
   const isActive = (path: string) => {
-    return pathname === path || pathname?.startsWith(`${path}/`)
+    if (!pathname) return false
+
+    if (path === "/user") {
+      return pathname === "/user"
+    }
+
+    return pathname === path || pathname.startsWith(path + "/")
   }
   const navItems = [
     {
